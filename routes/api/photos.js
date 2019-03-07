@@ -1,6 +1,6 @@
 var router = require('express').Router();
 const Photo = require('../../models').photo;
-const Location = require('../../models').location;
+const Post = require('../../models').post;
 
 router.get('/', (req, res) => {
     Photo.findAll()
@@ -11,15 +11,15 @@ router.get('/', (req, res) => {
 router.post('/:id', async (req, res) => {
 
     try {
-        const location = await Location.findById(req.params.id);
+        const post = await Post.findById(req.params.id);
             
         const photo = await Photo.create({
             url: req.body.url,
         });
             
-        await location.addPhotos(photo);
+        await post.addPhotos(photo);
         
-        return res.status(201).send(location);
+        return res.status(201).send(post);
     } catch (error) {
         return res.status(400).send(error);
     }

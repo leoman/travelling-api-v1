@@ -7,9 +7,14 @@ var http = require('http'),
     errorhandler = require('errorhandler'),
     swaggerUi = require('swagger-ui-express');
     var models  = require('./models');
+    const swaggerJsdoc = require('swagger-jsdoc');
     // swaggerDocument = require('./swagger.json');
-
+    const swaggerJsDocOptions = require('./swagger');
 var isProduction = process.env.NODE_ENV === 'production';
+
+
+
+const specs = swaggerJsdoc(swaggerJsDocOptions);
 
 // Create global app object
 var app = express();
@@ -25,7 +30,7 @@ app.use(require('method-override')());
 app.use(express.static(__dirname + '/public'));
 
 
-
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 // app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 if (!isProduction) {

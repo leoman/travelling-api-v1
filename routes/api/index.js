@@ -1,6 +1,6 @@
 const router = require('express').Router();
 
-router.use('/locations', require('./locations'));
+router.use('/posts', require('./posts'));
 router.use('/photos', require('./photos'));
 
 router.use(function(err, req, res, next){
