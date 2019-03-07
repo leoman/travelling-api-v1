@@ -1,6 +1,6 @@
 module.exports = function(sequelize, DataTypes) {
 
-    const Location = sequelize.define('Location', {
+    const Location = sequelize.define('location', {
         slug: {
             type: DataTypes.STRING
         },
@@ -27,8 +27,19 @@ module.exports = function(sequelize, DataTypes) {
         }
     });
 
+    
     Location.associate = models => {
-        models.Location.hasOne(models.Post);
+        models.location.post = Location.hasOne(models.post, {
+            onDelete: "CASCADE",
+            foreignKey: {
+              allowNull: false
+            }
+        });
+
+        models.location.photo = Location.hasMany(models.photo, {
+            onDelete: "CASCADE",
+        });
+
     };
 
     return Location;

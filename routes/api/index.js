@@ -1,6 +1,7 @@
 const router = require('express').Router();
 
 router.use('/locations', require('./locations'));
+router.use('/photos', require('./photos'));
 
 router.use(function(err, req, res, next){
   if(err.name === 'ValidationError'){

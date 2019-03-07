@@ -2,15 +2,12 @@ const Location = require('./location');
 
 module.exports = function(sequelize, DataTypes) {
 
-    const Post = sequelize.define('post', {
-        titleColour: {
+    const Photo = sequelize.define('photo', {
+        url: {
             type: DataTypes.STRING
-        },
-        content: {
-            type: DataTypes.TEXT
         },
     });
 
-    return Post;
+    return Photo;
     
 };

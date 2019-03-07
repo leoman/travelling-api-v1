@@ -68,7 +68,8 @@ app.use(function(err, req, res, next) {
   }});
 });
 
-models.sequelize.sync({force: true}).then(function() {
+// {force: true}
+models.sequelize.sync().then(function() {
 
 // finally, let's start our server...
     var server = app.listen( process.env.PORT || 3010, function(){

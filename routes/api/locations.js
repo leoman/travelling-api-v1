@@ -1,12 +1,18 @@
 var router = require('express').Router();
-const Post = require('../../models').Post;
-const Location = require('../../models').Location;
+const Post = require('../../models').post;
+const Photo = require('../../models').photo;
+const Location = require('../../models').location;
 
 router.get('/', (req, res) => {
     Location.findAll({
-        include: [{
-            model: Post,
-        }]
+        include: [
+            {
+                model: Post,
+            },
+            {
+                model: Photo,
+            }
+        ]
       })
     .then(locations => res.status(201).send(locations))
     .catch(error => res.status(400).send(error));
@@ -14,19 +20,27 @@ router.get('/', (req, res) => {
 
 router.post('/', (req, res) => {
     return Location
-      .create({
-        slug: req.body.slug,
-        lat: req.body.lat,
-        lng: req.body.lng,
-        location: req.body.location,
-        title: req.body.title,
-        date: req.body.date || new Date(),
-        duration: req.body.duration,
-        photo: req.body.photo,
-        hideFromBounding: req.body.hideFromBounding,
-      })
-      .then(location => res.status(201).send(location))
-      .catch(error => res.status(400).send(error));
+        .create({
+            slug: req.body.slug,
+            lat: req.body.lat,
+            lng: req.body.lng,
+            location: req.body.location,
+            title: req.body.title,
+            date: req.body.date || new Date(),
+            duration: req.body.duration,
+            photo: req.body.photo,
+            hideFromBounding: req.body.hideFromBounding,
+            post: {
+                content: req.body.content,
+                titleColour: req.body.titleColour,
+            }
+        }, {
+            include: [{
+              association: Location.post,
+            }]
+        })
+        .then(location => res.status(201).send(location))
+        .catch(error => res.status(400).send(error));
 });
 
 router.put('/:id', function(req, res, next) {
