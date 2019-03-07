@@ -9,15 +9,20 @@ router.get('/', (req, res) => {
 });
 
 router.post('/:id', async (req, res) => {
-    const location = await Location.findById(req.params.id);
+
+    try {
+        const location = await Location.findById(req.params.id);
+            
+        const photo = await Photo.create({
+            url: req.body.url,
+        });
+            
+        await location.addPhotos(photo);
         
-    const photo = await Photo.create({
-        url: req.body.url,
-    });
-           
-    await location.addPhotos(photo);
-    
-    return res.status(201).send(location);
+        return res.status(201).send(location);
+    } catch (error) {
+        return res.status(400).send(error);
+    }
 });
 
 module.exports = router;
