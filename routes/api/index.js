@@ -1,7 +1,14 @@
 const router = require('express').Router();
+const SchemaValidator = require('../../schemas/schemaValidator');
+const validateRequest = SchemaValidator(true);
+
+router.use((req, res, next) => {
+    validateRequest(req, res, next)
+});
 
 router.use('/posts', require('./posts'));
 router.use('/photos', require('./photos'));
+router.use('/auth', require('../../controllers/AuthController'));
 
 router.use(function(err, req, res, next){
   if(err.name === 'ValidationError'){

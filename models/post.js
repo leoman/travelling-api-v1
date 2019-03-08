@@ -1,4 +1,14 @@
+const Joi = require('joi');
+
 module.exports = function(sequelize, DataTypes) {
+
+    const PostSchema = Joi.object().keys({
+        title: Joi.string().required(),
+        slug: Joi.string().required(),
+        titleColour: Joi.string(),
+        content: Joi.string(),
+        photo: Joi.string(),
+    });
 
     const Post = sequelize.define('post', {
         title: {
@@ -34,6 +44,8 @@ module.exports = function(sequelize, DataTypes) {
         });
 
     };
+
+    Post.Schema = PostSchema;
 
     return Post;
     

@@ -31,7 +31,6 @@ app.use(express.static(__dirname + '/public'));
 
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
-// app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 if (!isProduction) {
   app.use(errorhandler());
