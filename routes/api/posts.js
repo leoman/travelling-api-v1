@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const authenticateToken = require('../../auth');
 const get = require('lodash').get;
 const Post = require('../../models').post;
 const Photo = require('../../models').photo;
@@ -24,7 +25,7 @@ const Location = require('../../models').location;
    *       200:
    *         description: posts
    */
-router.get('/', (req, res) => {
+router.get('/', authenticateToken, (req, res) => {
     Post.findAll({
         include: [
             {
@@ -52,7 +53,7 @@ router.get('/', (req, res) => {
    *       200:
    *         description: posts
    */
-router.get('/:id', (req, res) => {
+router.get('/:id', authenticateToken, (req, res) => {
     Post.findById(req.params.id, {
         include: [
             {
@@ -98,7 +99,7 @@ router.get('/:id', (req, res) => {
    *       200:
    *         description: posts
    */
-router.post('/', (req, res) => {
+router.post('/', authenticateToken, (req, res) => {
     return Post
         .create({
             title: req.body.title,
@@ -138,7 +139,7 @@ const updateOrReuse = (name, req, object) => get(req, `body.${name}`, object[nam
    *       200:
    *         description: posts
    */
-router.put('/:id', function(req, res, next) {
+router.put('/:id', authenticateToken, (req, res) => {
 
     return Post
         .findById(req.params.id)
@@ -184,7 +185,7 @@ router.put('/:id', function(req, res, next) {
    *       200:
    *         description: posts
    */
-router.delete('/:id', function(req, res, next) {
+router.delete('/:id', authenticateToken, (req, res, next) => {
     Post.findById(req.params.id).then(function(post){
         if (!post) { return res.sendStatus(401); }
   
@@ -192,6 +193,6 @@ router.delete('/:id', function(req, res, next) {
             .then(() => res.status(204).send(post))
             .catch((error) => res.status(400).send(error));
     }).catch(next);
-  });
+});
 
 module.exports = router;

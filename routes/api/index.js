@@ -3,7 +3,7 @@ const SchemaValidator = require('../../schemas/schemaValidator');
 const validateRequest = SchemaValidator(true);
 
 router.use((req, res, next) => {
-    validateRequest(req, res, next)
+    validateRequest(req, res, next);
 });
 
 router.use('/posts', require('./posts'));

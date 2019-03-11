@@ -1,4 +1,5 @@
 var router = require('express').Router();
+const authenticateToken = require('../../auth');
 const Photo = require('../../models').photo;
 const Post = require('../../models').post;
 
@@ -22,7 +23,7 @@ const Post = require('../../models').post;
  *       200:
  *         description: photos
  */
-router.get('/', (req, res) => {
+router.get('/', authenticateToken, (req, res) => {
     Photo.findAll()
     .then(photos => res.status(201).send(photos))
     .catch(error => res.status(400).send(error));
@@ -44,7 +45,7 @@ router.get('/', (req, res) => {
 
 const photoArray = ['https://i.dailymail.co.uk/i/pix/2014/06/24/article-2667126-1F1486F800000578-967_634x417.jpg', 'https://i.dailymail.co.uk/i/pix/2014/06/24/article-2667126-1F1486F800000578-967_634x417.jpg'];
 
-router.post('/:id', async (req, res) => {
+router.post('/:id', authenticateToken, async (req, res) => {
 
     try {
         const post = await Post.findById(req.params.id);
