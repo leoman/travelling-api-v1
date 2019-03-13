@@ -21,22 +21,24 @@ const authenticateUserCredentials = (username, password) => {
     return { user }
 }
 
+class AuthController {
 
-router.post('/login', function(req, res) {
-    const result = authenticateUserCredentials(req.body.username, req.body.password, res);
+    login(req, res) {
+        const result = authenticateUserCredentials(req.body.username, req.body.password, res);
+    
+        if(result.error) {
+            return res.status(401).send({ auth: false, token: null, error: result.error });
+        }
+    
+        const token = jwt.sign({ username: result.user.username }, config.auth.secret, {
+            expiresIn: 86400
+        });
+        res.status(200).send({ auth: true, token: token });
+    };
 
-    if(result.error) {
-        return res.status(401).send({ auth: false, token: null, error: result.error });
-    }
+    logout(req, res) {
+        res.status(200).send({ auth: false, token: null });
+    };
+}
 
-    const token = jwt.sign({ username: result.user.username }, config.auth.secret, {
-        expiresIn: 86400
-    });
-    res.status(200).send({ auth: true, token: token });
-});
-
-router.get('/logout', function(req, res) {
-    res.status(200).send({ auth: false, token: null });
-});
-
-module.exports = router;
+module.exports = new AuthController;

@@ -8,7 +8,7 @@ router.use((req, res, next) => {
 
 router.use('/posts', require('./posts'));
 router.use('/photos', require('./photos'));
-router.use('/auth', require('../../controllers/AuthController'));
+router.use('/auth', require('./auth'));
 
 router.use(function(err, req, res, next){
   if(err.name === 'ValidationError'){
