@@ -1,10 +1,10 @@
 const Joi = require('joi');
+const slugify = require('slugify')
 
 module.exports = function(sequelize, DataTypes) {
 
     const PostSchema = Joi.object().keys({
         title: Joi.string().required(),
-        slug: Joi.string().required(),
         titleColour: Joi.string(),
         content: Joi.string(),
         photo: Joi.string(),
@@ -46,6 +46,10 @@ module.exports = function(sequelize, DataTypes) {
     };
 
     Post.Schema = PostSchema;
+
+    Post.addHook('beforeSave', (post, options) => {
+        post.slug = slugify(post.title);
+    });
 
     return Post;
     

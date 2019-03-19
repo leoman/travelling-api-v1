@@ -5,6 +5,9 @@ const Post = require('../../models').post;
 const Photo = require('../../models').photo;
 const Location = require('../../models').location;
 
+const getProperty = (path, object) => get(object, `body.${path}`);
+const updateOrReuse = (name, req, object) => get(req, `body.${name}`, object[name]);
+
 /**
    * @swagger
    * tags:
@@ -25,8 +28,11 @@ const Location = require('../../models').location;
    *       200:
    *         description: posts
    */
-router.get('/', authenticateToken, (req, res) => {
+router.get('/', (req, res) => {
     Post.findAll({
+        order: [
+            [ Location, 'duration', 'asc' ],
+        ],
         include: [
             {
                 model: Location,
@@ -53,8 +59,37 @@ router.get('/', authenticateToken, (req, res) => {
    *       200:
    *         description: posts
    */
-router.get('/:id', authenticateToken, (req, res) => {
+router.get('/:id', (req, res) => {
     Post.findById(req.params.id, {
+        include: [
+            {
+                model: Location,
+            },
+            {
+                model: Photo,
+            }
+        ]
+      })
+    .then(post => res.status(201).send(post))
+    .catch(error => res.status(400).send(error));
+});
+
+/**
+   * @swagger
+   * /api/posts/:id:
+   *   get:
+   *     description: Returns a single post
+   *     tags:
+   *      - Posts
+   *     produces:
+   *      - application/json
+   *     responses:
+   *       200:
+   *         description: posts
+   */
+  router.get('/slug/:slug', (req, res) => {
+    Post.findOne({
+        where: { slug: req.params.slug },
         include: [
             {
                 model: Location,
@@ -109,11 +144,11 @@ router.post('/', authenticateToken, (req, res) => {
             date: req.body.date || new Date(),
             photo: req.body.photo,
             location: {
-                lat: req.body.lat,
-                lng: req.body.lng,
-                name: req.body.name,
-                duration: req.body.duration,
-                hideFromBounding: req.body.hideFromBounding,
+                lat: getProperty(req, 'location.lat'),
+                lng: getProperty(req, 'location.lng'),
+                name: getProperty(req, 'location.name'),
+                duration: getProperty(req, 'location.duration'),
+                hideFromBounding: getProperty(req, 'location.hideFromBounding'),
             }
         }, {
             include: [{
@@ -123,8 +158,6 @@ router.post('/', authenticateToken, (req, res) => {
         .then(post => res.status(201).send(post))
         .catch(error => res.status(400).send(error));
 });
-
-const updateOrReuse = (name, req, object) => get(req, `body.${name}`, object[name]);
 
 /**
    * @swagger
@@ -142,7 +175,11 @@ const updateOrReuse = (name, req, object) => get(req, `body.${name}`, object[nam
 router.put('/:id', authenticateToken, (req, res) => {
 
     return Post
-        .findById(req.params.id)
+        .findById(req.params.id, {
+            include: [
+                { association: Post.location, }
+              ]
+        })
         .then(post => {
             if (!post) {
                 return res.status(404).send({
@@ -157,13 +194,15 @@ router.put('/:id', authenticateToken, (req, res) => {
                 content: updateOrReuse('content', req, post),
                 date: updateOrReuse('date', req, post),
                 photo: updateOrReuse('photo', req, post),
-                location: {
-                    lat: updateOrReuse('lat', req, post),
-                    lng: updateOrReuse('lng', req, post),
-                    name: updateOrReuse('name', req, post),
-                    duration: updateOrReuse('duration', req, post),
-                    hideFromBounding: updateOrReuse('hideFromBounding', req, post),
-                }
+            })
+            .then(post => {
+                return post.location.updateAttributes({
+                    lat: updateOrReuse('location.lat', req, post),
+                    lng: updateOrReuse('location.lng', req, post),
+                    location: updateOrReuse('location.location', req, post),
+                    duration: updateOrReuse('location.duration', req, post),
+                    hideFromBounding: updateOrReuse('location.hideFromBounding', req, post),
+                })
             })
             .then(post => res.status(200).send(post))
             .catch((error) => res.status(400).send(error));
