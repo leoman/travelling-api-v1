@@ -5,7 +5,7 @@ const Post = require('../../models').post;
 const Photo = require('../../models').photo;
 const Location = require('../../models').location;
 
-const getProperty = (path, object) => get(object, `body.${path}`);
+const getProperty = (object, path) => get(object, `body.${path}`);
 const updateOrReuse = (name, req, object) => get(req, `body.${name}`, object[name]);
 
 /**
@@ -29,7 +29,19 @@ const updateOrReuse = (name, req, object) => get(req, `body.${name}`, object[nam
    *         description: posts
    */
 router.get('/', (req, res) => {
+
+    const status = req.query.status;
+
+    let where = {};
+
+    if(status) {
+        where = { status };
+    }
+
+    console.log('where', where);
+
     Post.findAll({
+        where: where,
         order: [
             [ Location, 'duration', 'asc' ],
         ],
@@ -143,10 +155,11 @@ router.post('/', authenticateToken, (req, res) => {
             content: req.body.content,
             date: req.body.date || new Date(),
             photo: req.body.photo,
+            status: req.body.status,
             location: {
                 lat: getProperty(req, 'location.lat'),
                 lng: getProperty(req, 'location.lng'),
-                name: getProperty(req, 'location.name'),
+                location: getProperty(req, 'location.location'),
                 duration: getProperty(req, 'location.duration'),
                 hideFromBounding: getProperty(req, 'location.hideFromBounding'),
             }
@@ -194,6 +207,7 @@ router.put('/:id', authenticateToken, (req, res) => {
                 content: updateOrReuse('content', req, post),
                 date: updateOrReuse('date', req, post),
                 photo: updateOrReuse('photo', req, post),
+                status: updateOrReuse('status', req, post),
             })
             .then(post => {
                 return post.location.updateAttributes({
@@ -227,9 +241,9 @@ router.put('/:id', authenticateToken, (req, res) => {
 router.delete('/:id', authenticateToken, (req, res, next) => {
     Post.findById(req.params.id).then(function(post){
         if (!post) { return res.sendStatus(401); }
-  
+
         return post.destroy()
-            .then(() => res.status(204).send(post))
+            .then(() => res.status(200).send({success: true, message: 'Deleted'}))
             .catch((error) => res.status(400).send(error));
     }).catch(next);
 });

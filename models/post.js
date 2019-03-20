@@ -1,13 +1,17 @@
 const Joi = require('joi');
-const slugify = require('slugify')
+const slugify = require('slugify');
 
 module.exports = function(sequelize, DataTypes) {
+
+    const validStatuses = ['live', 'draft'];
 
     const PostSchema = Joi.object().keys({
         title: Joi.string().required(),
         titleColour: Joi.string(),
         content: Joi.string(),
+        date: Joi.any().optional(),
         photo: Joi.string(),
+        status: Joi.string().valid(validStatuses),
     });
 
     const Post = sequelize.define('post', {
@@ -29,7 +33,14 @@ module.exports = function(sequelize, DataTypes) {
         photo: {
             type: DataTypes.STRING
         },
+        status: {
+            type: DataTypes.ENUM,
+            values: validStatuses,
+            defaultValue: validStatuses[0],
+        },
     });
+
+    Post.Schema = PostSchema;
 
     Post.associate = models => {
         models.post.location = Post.hasOne(models.location, {
@@ -43,9 +54,10 @@ module.exports = function(sequelize, DataTypes) {
             onDelete: "CASCADE",
         });
 
+        models.post.Schema = models.post.Schema.append({
+            location: models.location.Schema
+        });
     };
-
-    Post.Schema = PostSchema;
 
     Post.addHook('beforeSave', (post, options) => {
         post.slug = slugify(post.title);

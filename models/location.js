@@ -1,4 +1,14 @@
+const Joi = require('joi');
+
 module.exports = function(sequelize, DataTypes) {
+
+    const LocationSchema = Joi.object().keys({
+        location: Joi.string().required(),
+        lat: Joi.number().precision(8),
+        lng: Joi.number().precision(8),
+        duration: Joi.number(),
+        hideFromBounding: Joi.boolean().optional(),
+    });
 
     const Location = sequelize.define('location', {
         location: {
@@ -14,9 +24,12 @@ module.exports = function(sequelize, DataTypes) {
             type: DataTypes.INTEGER
         },
         hideFromBounding: {
-            type: DataTypes.BOOLEAN
+            type: DataTypes.BOOLEAN,
+            defaultValue: false,
         }
     });
+
+    Location.Schema = LocationSchema;
 
     return Location;
     
