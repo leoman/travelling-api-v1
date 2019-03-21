@@ -6,21 +6,31 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import errorhandler from 'errorhandler';
 import swaggerUi from 'swagger-ui-express';
-import models from './models';
+import models from './src/models';
 import swaggerJsdoc from 'swagger-jsdoc';
-import swaggerJsDocOptions from './swagger';
+import swaggerJsDocOptions from './src/swagger';
 import morgan from 'morgan';
 import methodOverride from 'method-override';
-import routes from './routes';
+import rateLimit from 'express-rate-limit';
+import routes from './src/routes';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
 const specs = swaggerJsdoc(swaggerJsDocOptions);
 
+const limiter = new rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100 // limit each IP to 100 requests per windowMs
+});
+
 // Create global app object
 const app = express();
 
+app.enable("trust proxy"); // Used as i am behind a reverse proxy (Heroku)
+
 app.use(cors());
+
+app.use(limiter);
 
 // Normal express config defaults
 app.use(morgan('dev'));
@@ -47,6 +57,8 @@ app.use(function(req, res, next) {
 });
 
 /// error handlers
+
+// err: any, req: express.Request, res: express.Response, next: express.NextFunction
 
 // development error handler
 // will print stacktrace
@@ -77,8 +89,10 @@ app.use(function(err, req, res, next) {
 models.sequelize.sync().then(function() {
 
 // finally, let's start our server...
-    const server = app.listen( process.env.PORT || 3010, function(){
-        console.log('Listening on port ' + server.address().port);
+    const server = app.listen( process.env.PORT || 3010, function() {
+        if(server) {
+            console.log(`Listening on port ${process.env.PORT || 3010}`);
+        }
     });
 
 });

@@ -1,9 +1,11 @@
 import express from 'express';
-import authenticateToken from '../../auth';
 import { get } from 'lodash';
-import Post from '../../models/post';
-import Photo from '../../models/photo';
-import Location from '../../models/location';
+import authenticateToken from '../../auth';
+import Models from '../../models';
+
+const Post = Models.post;
+const Photo = Models.photo;
+const Location = Models.location;
 
 let router = express.Router();
 

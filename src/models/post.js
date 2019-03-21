@@ -1,7 +1,7 @@
 import Joi from 'joi';
 import slugify from 'slugify';
 
-export default function(sequelize, DataTypes) {
+module.exports = function(sequelize, DataTypes) {
 
     const validStatuses = ['live', 'draft'];
 

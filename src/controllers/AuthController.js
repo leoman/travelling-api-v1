@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import config from '../config/config.json';
+import config from '../../config/config.json';
 
 const authenticateUserCredentials = (username, password) => {
 
