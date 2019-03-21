@@ -1,5 +1,5 @@
-const Post = require('../models').post;
+import Post from '../models/post';
 
-module.exports = {
+export default {
     '/posts': Post.Schema,
 };

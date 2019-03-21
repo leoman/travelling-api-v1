@@ -1,14 +1,19 @@
-const router = require('express').Router();
-const SchemaValidator = require('../../schemas/schemaValidator');
+import express from 'express';
+import PostRoutes from './posts';
+import PhotoRoutes from './photos';
+import AuthRoutes from './auth';
+import SchemaValidator from '../../schemas/schemaValidator';
+
 const validateRequest = SchemaValidator(true);
+let router = express.Router();
 
 router.use((req, res, next) => {
     validateRequest(req, res, next);
 });
 
-router.use('/posts', require('./posts'));
-router.use('/photos', require('./photos'));
-router.use('/auth', require('./auth'));
+router.use('/posts', PostRoutes);
+router.use('/photos', PhotoRoutes);
+router.use('/auth', AuthRoutes);
 
 router.use(function(err, req, res, next){
   if(err.name === 'ValidationError'){
@@ -24,4 +29,4 @@ router.use(function(err, req, res, next){
   return next(err);
 });
 
-module.exports = router;
+export default router;

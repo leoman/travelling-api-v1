@@ -1,4 +1,4 @@
-const Sequelize = require('sequelize');
+import Sequelize from 'sequelize';
 const sequelize = new Sequelize('zuoemgfp', 'zuoemgfp', 'twH7zw2lekrarOkxPS1ovBP_-u7YqCxq', {
     host: 'manny.db.elephantsql.com',
     port: 5432,
@@ -14,4 +14,4 @@ sequelize
     console.error('Unable to connect to the database:', err);
   });
 
-module.exports = sequelize;
+export default sequelize;

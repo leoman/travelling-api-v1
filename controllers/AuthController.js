@@ -1,7 +1,6 @@
-const router = require('express').Router();
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
-const config = require('../config/config.json');
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
+import config from '../config/config.json';
 
 const authenticateUserCredentials = (username, password) => {
 
@@ -41,4 +40,4 @@ class AuthController {
     };
 }
 
-module.exports = new AuthController;
+export default new AuthController;

@@ -1,32 +1,33 @@
-var http = require('http'),
-    path = require('path'),
-    methods = require('methods'),
-    express = require('express'),
-    bodyParser = require('body-parser'),
-    cors = require('cors'),
-    errorhandler = require('errorhandler'),
-    swaggerUi = require('swagger-ui-express');
-    var models  = require('./models');
-    const swaggerJsdoc = require('swagger-jsdoc');
-    // swaggerDocument = require('./swagger.json');
-    const swaggerJsDocOptions = require('./swagger');
-var isProduction = process.env.NODE_ENV === 'production';
+import http from 'http';
+import path from'path';
+import methods from 'methods';
+import express from 'express';
+import bodyParser from 'body-parser';
+import cors from 'cors';
+import errorhandler from 'errorhandler';
+import swaggerUi from 'swagger-ui-express';
+import models from './models';
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerJsDocOptions from './swagger';
+import morgan from 'morgan';
+import methodOverride from 'method-override';
+import routes from './routes';
 
-
+const isProduction = process.env.NODE_ENV === 'production';
 
 const specs = swaggerJsdoc(swaggerJsDocOptions);
 
 // Create global app object
-var app = express();
+const app = express();
 
 app.use(cors());
 
 // Normal express config defaults
-app.use(require('morgan')('dev'));
+app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.use(require('method-override')());
+app.use(methodOverride());
 app.use(express.static(__dirname + '/public'));
 
 
@@ -36,7 +37,7 @@ if (!isProduction) {
   app.use(errorhandler());
 }
 
-app.use(require('./routes'));
+app.use(routes);
 
 /// catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -76,8 +77,8 @@ app.use(function(err, req, res, next) {
 models.sequelize.sync().then(function() {
 
 // finally, let's start our server...
-    var server = app.listen( process.env.PORT || 3010, function(){
-    console.log('Listening on port ' + server.address().port);
+    const server = app.listen( process.env.PORT || 3010, function(){
+        console.log('Listening on port ' + server.address().port);
     });
 
 });

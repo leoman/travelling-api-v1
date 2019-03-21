@@ -1,7 +1,7 @@
-const Joi = require('joi');
-const slugify = require('slugify');
+import Joi from 'joi';
+import slugify from 'slugify';
 
-module.exports = function(sequelize, DataTypes) {
+export default function(sequelize, DataTypes) {
 
     const validStatuses = ['live', 'draft'];
 

@@ -1,9 +1,11 @@
-const router = require('express').Router();
-const authenticateToken = require('../../auth');
-const get = require('lodash').get;
-const Post = require('../../models').post;
-const Photo = require('../../models').photo;
-const Location = require('../../models').location;
+import express from 'express';
+import authenticateToken from '../../auth';
+import { get } from 'lodash';
+import Post from '../../models/post';
+import Photo from '../../models/photo';
+import Location from '../../models/location';
+
+let router = express.Router();
 
 const getProperty = (object, path) => get(object, `body.${path}`);
 const updateOrReuse = (name, req, object) => get(req, `body.${name}`, object[name]);
@@ -37,8 +39,6 @@ router.get('/', (req, res) => {
     if(status) {
         where = { status };
     }
-
-    console.log('where', where);
 
     Post.findAll({
         where: where,
@@ -248,4 +248,4 @@ router.delete('/:id', authenticateToken, (req, res, next) => {
     }).catch(next);
 });
 
-module.exports = router;
+export default router;

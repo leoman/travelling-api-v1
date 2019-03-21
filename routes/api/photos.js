@@ -1,7 +1,9 @@
-var router = require('express').Router();
-const authenticateToken = require('../../auth');
-const Photo = require('../../models').photo;
-const Post = require('../../models').post;
+import express from 'express';
+import authenticateToken from '../../auth';
+import Photo from '../../models/photo';
+import Post from '../../models/post';
+
+let router = express.Router();
 
 /**
  * @swagger
@@ -73,4 +75,4 @@ router.post('/:id', authenticateToken, async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

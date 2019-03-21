@@ -1,4 +1,4 @@
-module.exports = function(sequelize, DataTypes) {
+export default function(sequelize, DataTypes) {
 
     const Photo = sequelize.define('photo', {
         url: {

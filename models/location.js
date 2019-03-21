@@ -1,6 +1,6 @@
-const Joi = require('joi');
+import Joi from 'joi';
 
-module.exports = function(sequelize, DataTypes) {
+export default function(sequelize, DataTypes) {
 
     const LocationSchema = Joi.object().keys({
         location: Joi.string().required(),

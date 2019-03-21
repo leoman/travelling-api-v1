@@ -1,8 +1,8 @@
-const _ = require('lodash');
-const Joi = require('joi');
-const Schemas = require('./index');
+import _ from 'lodash';
+import Joi from 'joi';
+import Schemas from './index';
 
-module.exports = (useJoiError = false) => {
+export default (useJoiError = false) => {
     // useJoiError determines if we should respond with the base Joi error
     // boolean: defaults to false
     const _useJoiError = _.isBoolean(useJoiError) && useJoiError;
