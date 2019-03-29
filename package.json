@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node_modules/.bin/jest --watch",
     "start": "nodemon app.js --exec babel-node",
     "dev": "nodemon --exec ts-node app.ts",
     "dev1": "nodemon --exec ts-node app.ts",
@@ -54,6 +54,7 @@
     "babel-cli": "^6.26.0",
     "babel-preset-es2015": "^6.24.1",
     "faker": "^4.1.0",
+    "jest": "^24.5.0",
     "lodash": "^4.17.11",
     "nodemon": "^1.18.6",
     "sequelize-cli": "^5.4.0",

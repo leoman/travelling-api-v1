@@ -1,0 +1,9 @@
+Add Testing to the application
+Add Typescript to the application
+Add JSdocs for all routes
+Add runnable JS docs for Testing
+
+
+https://medium.com/riipen-engineering/testing-with-sequelize-cc51dafdfcf4
+https://codewithhugo.com/unit-testing-sequelize-4-es6-class-models/
+https://itnext.io/unit-testing-sequelize-models-made-easy-108f079f1e38
