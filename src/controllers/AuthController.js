@@ -41,3 +41,19 @@ class AuthController {
 }
 
 export default new AuthController;
+
+
+
+// // GET /acc/:accountId
+// exports.get = (req, res) => {
+//     account.get(req.params.accountId, req.query, headers(req), req, res, (mifyBody) => {
+//       res.json(mifyBody);
+//     });
+//   };
+  
+//   // GET /acc/:accountId/activity
+//   exports.activity = (req, res) => {
+//     account.activity(req.params.accountId, req.query, headers(req), req, res, (mifyBody) => {
+//       res.json(mifyBody);
+//     });
+//   };

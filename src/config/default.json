@@ -1,0 +1,135 @@
+{
+    "api": {
+      "urlPrefix": "/metal",
+      "versions": {
+        "v1": ["ept", "ff", "live", "account", "betslip", "highlighted", "cms", "status", "falcon", "genericMifyProxy"],
+        "v2": ["cms", "status", "genericMifyProxy"]
+      }
+    },
+    "throttle": { },
+    "cache": {
+      "urls": {
+        "/metal/v1/ff/{itemIds}": 5,
+        "/metal/v1/ept": 60,
+        "/metal/v1/live": 5,
+        "/metal/v1/best": 240,
+        "/metal/v1/lme": 60,
+        "/metal/v1/cms/adverts": 240,
+        "/metal/v1/cms/bestBets": 240,
+        "/metal/v1/cms/bestBets/{id}": 240,
+        "/metal/v1/cms/footerLinks": 240,
+        "/metal/v1/cms/genericPages": 240,
+        "/metal/v1/cms/genericPages/{id}": 240,
+        "/metal/v1/cms/news": 240,
+        "/metal/v1/cms/news/{id}": 240,
+        "/metal/v1/cms/lastMinuteEvents": 240,
+        "/metal/v1/cms/leagues": 240,
+        "/metal/v1/cms/legalInformations/headers": 240,
+        "/metal/v1/cms/legalInformations/footers": 240,
+        "/metal/v1/cms/logos": 240,
+        "/metal/v1/cms/menuItems": 240,
+        "/metal/v1/cms/seo/blocks": 240,
+        "/metal/v1/cms/seo/links": 240
+      },
+      "server": "127.0.0.1:11211",
+      "options": {
+        "idle": 30000,
+        "timeout": 200
+      },
+      "cacheableResponseCodes": [
+        200, 203, 204, 206, 300, 301, 404, 405, 410, 414, 501
+      ]
+    },
+    "redis": {
+      "host": null,
+      "port": 6379
+    },
+    "sessionThrottler": {
+      "enabled": false,
+      "idHeader": "X-Session-Id",
+      "typeHeader": "X-Session-Type",
+      "timeoutMs": 30000,
+      "refreshIntervalMs": 10000,
+      "ignoredResponseCodes": [401, 403, 429],
+      "authenticated": {
+        "key": "authenticatedSessionSet",
+        "maximumSessions": 25000
+      },
+      "anonymous": {
+        "key": "anonymousSessionSet",
+        "maximumSessions": 25000
+      }
+    },
+    "services": {
+      "mify": {
+        "v1": {
+          "url": "https://localhost:8443/abp/m",
+          "blacklist": [
+            "GET /fdjasyncbs/{falconId}",
+            "PUT /acc/{accountId}/xeres/keep",
+            "PUT /acc/{accountId}/xeres/bal"
+          ]
+        },
+        "v2": {
+          "url": "https://localhost:8443/abp/mify/v2",
+          "blacklist": [
+            "GET /fdjasyncbs/{falconId}",
+            "PUT /acc/{accountId}/xeres/keep",
+            "PUT /acc/{accountId}/xeres/bal"
+          ]
+        },
+        "forwardDebuggingHeaders": false,
+        "strictSSL": false,
+        "gzip": true,
+        "circuitBreakerFailureThreshold": 0.5,
+        "circuitBreakerResetTimeout": 30000,
+        "timeout": 5000
+      },
+      "cms": {
+        "url": "http://localhost:5001/api/v3",
+        "circuitBreakerFailureThreshold": 0.5,
+        "circuitBreakerResetTimeout": 30000,
+        "timeout": 5000
+      }
+    },
+    "documentation": {
+      "enabled": true,
+      "httpAllowed": false,
+      "urlPrefix": "/api-docs"
+    },
+    "logger": {
+      "level": "info",
+      "meta": false,
+      "useLocalTime": true,
+      "console": {
+        "enabled": true
+      },
+      "file": {
+        "enabled": false,
+        "path": "log/metal/app.log",
+        "json": false
+      },
+      "logstash": {
+        "enabled": false,
+        "host": "127.0.0.1",
+        "port": 28777,
+        "nodeName": "Metal node"
+      },
+      "druid": {
+        "enabled": true,
+        "path": "data/druid"
+      }
+    },
+    "status": {
+      "unique": ""
+    },
+    "processes": {
+      "port": 1300,
+      "instances": 0,
+      "execMode": "cluster",
+      "maxMemory": "140M",
+      "watch": false
+    },
+    "poweredBy": "Metal"
+  }
+  
