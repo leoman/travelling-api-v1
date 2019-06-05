@@ -12,6 +12,7 @@ module.exports = function(sequelize, DataTypes) {
         date: Joi.any().optional(),
         photo: Joi.string(),
         status: Joi.string().valid(validStatuses),
+        hidden: Joi.boolean()
     });
 
     const Post = sequelize.define('post', {
@@ -38,6 +39,10 @@ module.exports = function(sequelize, DataTypes) {
             values: validStatuses,
             defaultValue: validStatuses[0],
         },
+        hidden: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false,
+        }
     });
 
     Post.Schema = PostSchema;
