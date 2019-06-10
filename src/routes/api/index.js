@@ -1,6 +1,7 @@
 import express from 'express';
 import PostRoutes from './posts';
 import PhotoRoutes from './photos';
+import RSSRoutes from './rss';
 import AuthRoutes from './auth';
 import SchemaValidator from '../../schemas/schemaValidator';
 
@@ -13,6 +14,7 @@ router.use((req, res, next) => {
 
 router.use('/posts', PostRoutes);
 router.use('/photos', PhotoRoutes);
+router.use('/rss', RSSRoutes);
 router.use('/auth', AuthRoutes);
 
 router.use(function(err, req, res, next){
