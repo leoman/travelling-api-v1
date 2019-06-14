@@ -158,7 +158,7 @@ router.post('/', authenticateToken, (req, res) => {
             date: req.body.date || new Date(),
             photo: req.body.photo,
             status: req.body.status,
-            hidden: req.body.hidden,
+            order: req.body.order,
             location: {
                 lat: getProperty(req, 'location.lat'),
                 lng: getProperty(req, 'location.lng'),
@@ -211,7 +211,7 @@ router.put('/:id', authenticateToken, (req, res) => {
                 date: updateOrReuse('date', req, post),
                 photo: updateOrReuse('photo', req, post),
                 status: updateOrReuse('status', req, post),
-                hidden: updateOrReuse('hidden', req, post),
+                order: updateOrReuse('order', req, post),
             })
             .then(post => {
                 return post.location.updateAttributes({

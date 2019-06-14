@@ -30,6 +30,9 @@ module.exports = function(sequelize, DataTypes) {
         date: {
             type: DataTypes.DATE
         },
+        order: {
+            type: DataTypes.DATE
+        },
         photo: {
             type: DataTypes.STRING
         },
