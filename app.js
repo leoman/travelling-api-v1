@@ -86,7 +86,7 @@ app.use(function(err, req, res, next) {
 });
 
 // {force: true}
-models.sequelize.sync({force: true}).then(function() {
+models.sequelize.sync().then(function() {
 
 // finally, let's start our server...
     const server = app.listen( process.env.PORT || 3010, function() {
