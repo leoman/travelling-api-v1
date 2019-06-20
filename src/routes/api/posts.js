@@ -45,7 +45,7 @@ router.get('/', (req, res) => {
     Post.findAll({
         where: where,
         order: [
-            [ Location, 'duration', 'asc' ],
+            ['order', 'DESC'],
         ],
         include: [
             {
