@@ -75,4 +75,14 @@ router.post('/:id', authenticateToken, async (req, res) => {
     }
 });
 
+router.delete('/:id', authenticateToken, (req, res, next) => {
+    Photo.findById(req.params.id).then(function(photo){
+        if (!photo) { return res.sendStatus(401); }
+
+        return photo.destroy()
+            .then(() => res.status(200).send({success: true, message: 'Deleted'}))
+            .catch((error) => res.status(400).send(error));
+    }).catch(next);
+});
+
 export default router;
