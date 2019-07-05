@@ -52,24 +52,25 @@ router.post('/:id', authenticateToken, async (req, res) => {
     try {
         const post = await Post.findById(req.params.id);
 
-        const photos = photoArray;
+        // const photos = photoArray;
 
-        const addPhotos = async (photos, post) => {
+        // const addPhotos = async (photos, post) => {
 
-            const photoObjects = await photos.map(async photo => {
-                return await Photo.create({
-                    url: photo,
-                });
-            });
+        //     const photoObjects = await photos.map(async photo => {
+        //         return await Photo.create({
+        //             url: photo,
+        //         });
+        //     });
             
-            return Promise.all(photoObjects).then((completed) => {
-                return post.addPhotos(completed);
-            });
-        }
+        //     return Promise.all(photoObjects).then((completed) => {
+        //         return post.addPhotos(completed);
+        //     });
+        // }
 
-        const postObject = await addPhotos(photos, post);
+        // const postObject = await addPhotos(photos, post);
         
-        return res.status(201).send(postObject);
+        return res.status(201).send(post);
+        // return res.status(201).send(postObject);
     } catch (error) {
         return res.status(400).send(error);
     }
