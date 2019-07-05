@@ -1,7 +1,9 @@
 import express from 'express';
 import authenticateToken from '../../auth';
-import Photo from '../../models/photo';
-import Post from '../../models/post';
+import Models from '../../models';
+
+const Photo = Models.photo;
+const Post = Models.post;
 
 let router = express.Router();
 
