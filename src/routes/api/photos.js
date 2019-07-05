@@ -47,14 +47,12 @@ router.get('/', authenticateToken, (req, res) => {
  *         description: photos
  */
 
-const photoArray = ['https://i.dailymail.co.uk/i/pix/2014/06/24/article-2667126-1F1486F800000578-967_634x417.jpg', 'https://i.dailymail.co.uk/i/pix/2014/06/24/article-2667126-1F1486F800000578-967_634x417.jpg'];
-
 router.post('/:id', authenticateToken, async (req, res) => {
 
     try {
         const post = await Post.findById(req.params.id);
 
-        const photos = photoArray;
+        const photos = [req.body.photo];
 
         const addPhotos = async (photos, post) => {
 
