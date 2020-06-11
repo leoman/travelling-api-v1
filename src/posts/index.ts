@@ -1,0 +1,1 @@
+export { typeDef as Post } from './typeDef'

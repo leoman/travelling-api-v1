@@ -1,0 +1,42 @@
+{
+  "name": "travelling-api",
+  "version": "1.0.0",
+  "description": "An API to store and retrive posts about my travelling",
+  "main": "index.js",
+  "scripts": {
+    "tsc": "tsc",
+    "dev": "ts-node-dev src/server.ts",
+    "lint": "eslint --ext .ts .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leoman/travelling-api.git"
+  },
+  "author": "Peter Mansell",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/leoman/travelling-api/issues"
+  },
+  "homepage": "https://github.com/leoman/travelling-api#readme",
+  "devDependencies": {
+    "@types/node": "^14.0.13",
+    "@typescript-eslint/eslint-plugin": "^3.2.0",
+    "@typescript-eslint/parser": "^3.2.0",
+    "eslint": "^7.2.0",
+    "ts-node": "^8.10.2",
+    "ts-node-dev": "^1.0.0-pre.44",
+    "typescript": "^3.9.5"
+  },
+  "dependencies": {
+    "@types/jsonwebtoken": "^8.5.0",
+    "apollo-server": "^2.14.3",
+    "graphql": "^15.1.0",
+    "graphql-tools": "^6.0.9",
+    "jsonwebtoken": "^8.5.1",
+    "pg": "^8.2.1",
+    "pg-hstore": "^2.3.3",
+    "sequelize": "^5.21.12",
+    "sequelize-cli": "^5.5.1"
+  }
+}

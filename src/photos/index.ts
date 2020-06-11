@@ -1,0 +1,1 @@
+export { typeDef as Photo } from './typeDef'
