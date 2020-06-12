@@ -26,10 +26,10 @@ export const typeDef = `
     ) : Post
     deletePost (
       id: String!
-    ): DeleteResponse
+    ): PostDeleteResponse
   }
 
-  type DeleteResponse {
+  type PostDeleteResponse {
     success: Boolean!
     message: String!
   }

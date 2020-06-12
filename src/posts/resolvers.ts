@@ -23,6 +23,7 @@ const postKeys: string[] = [
 ]
 
 interface PatchArgs extends PostArgs {
+  [key: string]: any
   id: string
 }
 
@@ -100,7 +101,7 @@ export const resolvers: Resolvers = {
         }
 
 
-        const fieldsToUpdate = postKeys.reduce((agg, key) => {
+        const fieldsToUpdate = postKeys.reduce((agg: { [key: string]: any }, key) => {
           if (args[key]) {
             agg[key] = args[key]
           }
