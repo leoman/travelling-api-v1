@@ -1,40 +1,52 @@
-// import database from './database'
-import { ApolloServer, gql, makeExecutableSchema } from 'apollo-server'
+import { merge } from 'lodash'
+import { ApolloServer, makeExecutableSchema } from 'apollo-server'
+
+import logger from './logging'
+
 // import jwt from 'jsonwebtoken'
-import { Post } from './posts'
+
+import { postTypeDef, postResolver } from './posts'
 import { Location } from './locations'
 import { Photo } from './photos'
 
+
+
+import { sequelizeCheck } from './database'
+sequelizeCheck()
+
+
 // const JWT_SECRET = 'MY_SUPER_SECRET_KEY'
 
-export const Hello = `
+const Query = `
   type Query {
+    _empty: String,
     hello: String
   }
-`
-
-
-export const typeDefs = gql`
-  type Query {
-    hello: String
+  type Mutation {
+    _empty: String,
   }
-`
+`;
 
-
-const resolvers = {
+interface Resolvers {
   Query: {
-    hello: () => 'Hello world!',
+    [field: string]: (parent: any, args: object) => string;
   }
 }
 
+const resolvers: Resolvers = {
+  Query: {
+    hello: () => 'Hello world!',
+  },
+}
+
 const schema = makeExecutableSchema({
-  typeDefs: [ Post, Location, Photo, Hello ],
-  resolvers
+  typeDefs: [ Query, postTypeDef, Location, Photo ],
+  resolvers: merge(resolvers, postResolver),
 })
 
 const server = new ApolloServer({ schema })
 
 server.listen().then(({ url, subscriptionsUrl }): void => {
-  console.log(`🚀 Server ready at ${url}`)
-  console.log(`🚀 Subscriptions ready at ${subscriptionsUrl}`)
+  logger.log('info', `🚀 Server ready at ${url}`)
+  logger.log('info',`🚀 Subscriptions ready at ${subscriptionsUrl}`)
 })

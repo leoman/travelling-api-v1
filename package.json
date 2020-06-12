@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "tsc": "tsc",
-    "dev": "ts-node-dev src/server.ts",
+    "dev": "ts-node-dev src/server.ts --inspect",
     "lint": "eslint --ext .ts .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -30,13 +30,19 @@
   },
   "dependencies": {
     "@types/jsonwebtoken": "^8.5.0",
+    "@types/lodash": "^4.14.155",
     "apollo-server": "^2.14.3",
     "graphql": "^15.1.0",
     "graphql-tools": "^6.0.9",
+    "joi": "^14.3.1",
     "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.15",
     "pg": "^8.2.1",
     "pg-hstore": "^2.3.3",
     "sequelize": "^5.21.12",
-    "sequelize-cli": "^5.5.1"
+    "sequelize-cli": "^5.5.1",
+    "slugify": "^1.4.0",
+    "winston": "^3.2.1",
+    "winston-transport": "^4.3.0"
   }
 }

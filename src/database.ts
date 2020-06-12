@@ -1,17 +1,26 @@
 import { Sequelize } from 'sequelize'
+import logger from './logging'
 import { getDatabaseConfig, Config } from './config'
 
 const config: Config = getDatabaseConfig(process.env.NODE_ENV || 'development')
 
 const sequelize = new Sequelize(config.database, config.username, config.password, config)
 
-sequelize
+export const sequelizeCheck = async () => {
+  sequelize
   .authenticate()
   .then(() => {
-    console.log('Connection has been established successfully.')
+    logger.log('info', 'Connection to the database has been established successfully.')
   })
   .catch((err: string) => {
-    console.error('Unable to connect to the database:', err)
+    logger.log({
+      level: 'error',
+      message:'Unable to connect to the database:',
+      err
+    })
   })
+
+  // await sequelize.sync({ force: true });
+}
 
   export default sequelize
