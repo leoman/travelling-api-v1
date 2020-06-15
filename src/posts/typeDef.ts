@@ -13,6 +13,11 @@ export const typeDef = `
       order: String
       photo: String
       status: Status
+      location: String
+      lat: Float
+      lng: Float
+      duration: Int
+      hideFromBounding: Boolean
     ): Post
     editPost (
       id: String!
@@ -23,6 +28,11 @@ export const typeDef = `
       order: String
       photo: String
       status: Status
+      location: String
+      lat: Float
+      lng: Float
+      duration: Int
+      hideFromBounding: Boolean
     ) : Post
     deletePost (
       id: String!

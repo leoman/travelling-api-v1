@@ -6,14 +6,12 @@ import logger from './logging'
 // import jwt from 'jsonwebtoken'
 
 import { postTypeDef, postResolver } from './posts'
-import { Location } from './locations'
-import { Photo } from './photos'
+import { locationTypeDef } from './locations'
+import { photoTypeDef, photoResolver } from './photos'
 
-
-
-import { sequelizeCheck } from './database'
+import { sequelizeCheck, sequelizeSync } from './database'
 sequelizeCheck()
-
+sequelizeSync(false)
 
 // const JWT_SECRET = 'MY_SUPER_SECRET_KEY'
 
@@ -40,8 +38,8 @@ const resolvers: Resolvers = {
 }
 
 const schema = makeExecutableSchema({
-  typeDefs: [ Query, postTypeDef, Location, Photo ],
-  resolvers: merge(resolvers, postResolver),
+  typeDefs: [ Query, postTypeDef, locationTypeDef, photoTypeDef ],
+  resolvers: merge(resolvers, postResolver, photoResolver),
 })
 
 const server = new ApolloServer({ schema })

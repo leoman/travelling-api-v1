@@ -1,6 +1,8 @@
 import { UserInputError, ApolloError } from 'apollo-server'
 import logger from '../logging'
 import { Post } from './'
+import { Location } from '../locations'
+import { Photo } from '../photos'
 
 interface PostArgs {
   title: string
@@ -10,17 +12,12 @@ interface PostArgs {
   order?: Date
   photo?: string
   status?: string
+  lat?: number
+  lng?: number
+  location?: string
+  duration?: number
+  hideFromBounding?: boolean
 }
-
-const postKeys: string[] = [
-  'title',
-  'titleColour',
-  'content',
-  'date',
-  'order',
-  'photo',
-  'status'
-]
 
 interface PatchArgs extends PostArgs {
   [key: string]: any
@@ -33,7 +30,7 @@ interface DeleteArgs {
 
 interface Resolvers {
   Query: {
-    [field: string]: (parent: any, args: object) => Promise<Post[] | undefined>;
+    [field: string]: (parent: any, args: object) => Promise<Post[]>;
   }
   Mutation: {
     addPost: (parent: any, args: PostArgs) => Promise<Post>;
@@ -42,22 +39,56 @@ interface Resolvers {
   }
 }
 
+const patchPostKeys: string[] = [
+  'title',
+  'titleColour',
+  'content',
+  'date',
+  'order',
+  'photo',
+  'status',
+]
+
+const patchLocationKeys: string[] = [
+  'lat',
+  'lng',
+  'location',
+  'duration',
+  'hideFromBounding'
+]
+
 export const resolvers: Resolvers = {
   Query: {
-    allPosts: async (): Promise<Post[] | undefined> => {
+    allPosts: async () => {
       try {
         logger.log('info', 'Finding all Posts')
         const posts: Post[] = await Post.findAll({
           order: [
               ['order', 'DESC'],
+          ],
+          include: [
+              {
+                  model: Location,
+              },
+              {
+                  model: Photo,
+              }
           ]
         })
-        return posts
-      } catch(e) {
+
+        return posts.map(post => ({
+          ...post.dataValues,
+          location: post.Location,
+          photos: post.Photos
+        }))
+      } catch(error) {
         logger.log({
           level: 'error',
           message:'Unable to fetch all Posts',
-          extra: e.message
+          extra: error.message
+        })
+        throw new ApolloError(`Unable to fetch Posts`, '500', {
+          error
         })
       }
     }
@@ -65,6 +96,16 @@ export const resolvers: Resolvers = {
   Mutation: {
     addPost: async (_root, args) => {
       try {
+
+        const location = await Location
+          .create({
+            lat: args.lat,
+            lng: args.lng,
+            location: args.location,
+            duration: args.duration,
+            hideFromBounding: args.hideFromBounding,
+          })
+
         const post = await Post
           .create({
               title: args.title,
@@ -74,9 +115,19 @@ export const resolvers: Resolvers = {
               photo: args.photo,
               status: args.status,
               order: args.order,
-          })
+          }
+        )
+
+        await post.setLocation(location)
+
         logger.log('info', `Saving a new Post ${post.title}`)
-        return post;
+       
+        return {
+          ...post.dataValues,
+          location: {
+            ...location.dataValues
+          }
+        }
       } catch(error) {
         logger.log({
           level: 'error',
@@ -92,7 +143,9 @@ export const resolvers: Resolvers = {
     editPost: async (_parent, args) => {
 
       try {
-        const post = await Post.findOne({ where: { id: args.id } })
+        const post = await Post.findOne({ where: { id: args.id }, include: [
+          { association: Post.associations.Location, }
+        ] })
         
         if (!post) {
           throw new UserInputError(`No Post found with ID: ${args.id}`, {
@@ -100,20 +153,31 @@ export const resolvers: Resolvers = {
           })
         }
 
-
-        const fieldsToUpdate = postKeys.reduce((agg: { [key: string]: any }, key) => {
-          if (args[key]) {
+        const postFieldsToUpdate = patchPostKeys.reduce((agg: { [key: string]: any }, key) => {
+          if (args[key] || args.hasOwnProperty(key)) {
             agg[key] = args[key]
           }
           return agg
         }, {})
 
-        const updatedPost = await post.update(fieldsToUpdate)
+        const locationFieldsToUpdate = patchLocationKeys.reduce((agg: { [key: string]: any }, key) => {
+          if (args[key] || args.hasOwnProperty(key)) {
+            agg[key] = args[key]
+          }
+          return agg
+        }, {})
 
-        return updatedPost
+        const updatedPost = await post.update(postFieldsToUpdate)
 
+        const updatedLocation = await updatedPost.Location.update(locationFieldsToUpdate)
+
+        return {
+          ...updatedPost.dataValues,
+          location: {
+            ...updatedLocation.dataValues
+          }
+        }
       } catch(error) {
-        console.log(error)
         throw new ApolloError(`Unable to update Post with ID: ${args.id}`, '500', {
           error
         })

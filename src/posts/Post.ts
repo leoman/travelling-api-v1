@@ -1,8 +1,10 @@
 // import Joi from 'joi'
 import slugify from 'slugify'
-import { Model, DataTypes } from 'sequelize'
+import { Model, DataTypes, Association } from 'sequelize'
 // import { HasManyGetAssociationsMixin, HasManyAddAssociationMixin, HasManyHasAssociationMixin, Association, HasManyCountAssociationsMixin, HasManyCreateAssociationMixin } from 'sequelize';
 import sequelize from '../database'
+import { Location } from '../locations'
+import { Photo } from '../photos'
 
 enum Status {
   "live" = "live",
@@ -20,10 +22,19 @@ class Post extends Model {
   public photo!: string | null
   public status!: Status
 
+  public dataValues: any
+
   // timestamps!
   public readonly createdAt!: Date
   public readonly updatedAt!: Date
 
+  public static Location: Association<Model<Location>>
+  public static Photo: Association<Model<Photo>>
+
+  public static associations: {
+    Photos: Association<Post, Photo>;
+    Location: Association<Post, Location>;
+  };
 }
 
 const validStatuses: Status[] = [Status.live, Status.draft]
@@ -78,6 +89,18 @@ Post.addHook('beforeSave', (post: Post) => {
   post.slug = slugify(post.title, { lower: true });
 })
 
-// export Post as 
+Post.hasOne(Location, {
+  onDelete: "CASCADE",
+  foreignKey: {
+    allowNull: true
+  }
+});
+
+Post.hasMany(Photo, {
+  onDelete: "CASCADE",
+  foreignKey: {
+    allowNull: true
+  }
+});
 
 export default Post

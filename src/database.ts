@@ -19,8 +19,10 @@ export const sequelizeCheck = async () => {
       err
     })
   })
+}
 
-  // await sequelize.sync({ force: true });
+export const sequelizeSync = async (force: boolean) => {
+  await sequelize.sync({ force: force });
 }
 
   export default sequelize
