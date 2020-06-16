@@ -37,7 +37,7 @@ class Post extends Model {
   };
 }
 
-const validStatuses: Status[] = [Status.live, Status.draft]
+export const validStatuses: Status[] = [Status.live, Status.draft]
 
 Post.init({
   id: {

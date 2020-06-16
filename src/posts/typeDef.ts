@@ -1,7 +1,7 @@
 export const typeDef = `
   
   extend type Query {
-    allPosts: [Post!]!
+    allPosts(status: String): [Post!]!
     post(id: String): Post!
   }
 

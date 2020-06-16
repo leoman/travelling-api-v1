@@ -1,8 +1,12 @@
 import { UserInputError, ApolloError } from 'apollo-server'
 import logger from '../logging'
-import { Post } from './'
+import { Post, validStatuses } from './'
 import { Location } from '../locations'
 import { Photo } from '../photos'
+
+interface AllPostsArgs {
+  status?: string
+}
 
 interface PostArgs {
   title: string
@@ -34,7 +38,7 @@ interface Context {
 
 interface Resolvers {
   Query: {
-    allPosts: (parent: any, args: object) => Promise<Post[]>;
+    allPosts: (parent: any, args: AllPostsArgs) => Promise<Post[]>;
     post: (parent: any, args: SelectPostArgs) => Promise<Post>;
   }
   Mutation: {
@@ -64,10 +68,20 @@ const patchLocationKeys: string[] = [
 
 export const resolvers: Resolvers = {
   Query: {
-    allPosts: async () => {
+    allPosts: async (_root, args) => {
       try {
         logger.log('info', 'Finding all Posts')
+
+        const status = args.status;
+
+        let where = {};
+
+        if(status && validStatuses.includes(status)) {
+            where = { status };
+        }
+
         const posts: Post[] = await Post.findAll({
+          where: where,
           order: [
               ['order', 'DESC'],
           ],
