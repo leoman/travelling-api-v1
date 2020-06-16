@@ -2,6 +2,7 @@ export const typeDef = `
   
   extend type Query {
     allPosts: [Post!]!
+    post(id: String): Post!
   }
 
   extend type Mutation {

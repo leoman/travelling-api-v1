@@ -24,18 +24,23 @@ interface PatchArgs extends PostArgs {
   id: string
 }
 
-interface DeleteArgs {
+interface SelectPostArgs {
   id: string
+}
+
+interface Context {
+  decodedToken: string
 }
 
 interface Resolvers {
   Query: {
-    [field: string]: (parent: any, args: object) => Promise<Post[]>;
+    allPosts: (parent: any, args: object) => Promise<Post[]>;
+    post: (parent: any, args: SelectPostArgs) => Promise<Post>;
   }
   Mutation: {
-    addPost: (parent: any, args: PostArgs) => Promise<Post>;
-    editPost: (parent: any, args: PatchArgs) => Promise<Post>;
-    deletePost: (parent: any, args: DeleteArgs) => Promise<{ success: boolean, message: string }>;
+    addPost: (parent: any, args: PostArgs, context: Context) => Promise<Post>;
+    editPost: (parent: any, args: PatchArgs, context: Context) => Promise<Post>;
+    deletePost: (parent: any, args: SelectPostArgs, context: Context) => Promise<{ success: boolean, message: string }>;
   }
 }
 
@@ -88,6 +93,37 @@ export const resolvers: Resolvers = {
           extra: error.message
         })
         throw new ApolloError(`Unable to fetch Posts`, '500', {
+          error
+        })
+      }
+    },
+    post: async (_root, args) => {
+      try {
+        logger.log('info', `Finding a single Post: ${args.id}`)
+
+        const post = await Post.findOne({ where: { id: args.id }, include: [
+          { association: Post.associations.Location, },
+          { association: Post.associations.Photos, }
+        ] })
+
+        if (!post) {
+          throw new UserInputError(`No Post found with ID: ${args.id}`, {
+            invalidArgs: args,
+          })
+        }
+
+        return {
+          ...post.dataValues,
+          location: post.Location,
+          photos: post.Photos
+        }
+      } catch(error) {
+        logger.log({
+          level: 'error',
+          message:'Unable to fetch a single Post',
+          extra: error.message
+        })
+        throw new ApolloError(`Unable to fetch Post`, '500', {
           error
         })
       }
