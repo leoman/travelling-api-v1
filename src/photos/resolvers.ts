@@ -42,8 +42,12 @@ export const resolvers: Resolvers = {
     }
   },
   Mutation: {
-    addPhoto: async (_root, args) => {
+    addPhoto: async (_root, args, { decodedToken }) => {
       try {
+
+        if (!decodedToken) {
+          throw new UserInputError('Not Authenticated, please sign in')
+        }
 
         const post = await Post.findOne({ where: { id: args.id }, include: [
           { association: Post.associations.Photos }
@@ -78,7 +82,12 @@ export const resolvers: Resolvers = {
         })
       }
     },
-    deletePhoto: async (_root, args) => {
+    deletePhoto: async (_root, args, { decodedToken }) => {
+
+      if (!decodedToken) {
+        throw new UserInputError('Not Authenticated, please sign in')
+      }
+
       const photo = await Photo.findOne({ where: { id: args.id } })
 
       if (!photo) { 

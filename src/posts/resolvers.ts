@@ -94,7 +94,12 @@ export const resolvers: Resolvers = {
     }
   },
   Mutation: {
-    addPost: async (_root, args) => {
+    addPost: async (_root, args, { decodedToken }) => {
+
+      if (!decodedToken) {
+        throw new UserInputError('Not Authenticated, please sign in')
+      }
+
       try {
 
         const location = await Location
@@ -140,7 +145,11 @@ export const resolvers: Resolvers = {
         })
       }
     },
-    editPost: async (_parent, args) => {
+    editPost: async (_parent, args, { decodedToken }) => {
+
+      if (!decodedToken) {
+        throw new UserInputError('Not Authenticated, please sign in')
+      }
 
       try {
         const post = await Post.findOne({ where: { id: args.id }, include: [
@@ -183,7 +192,12 @@ export const resolvers: Resolvers = {
         })
       }
     },
-    deletePost: async (_root, args) => {
+    deletePost: async (_root, args, { decodedToken }) => {
+
+      if (!decodedToken) {
+        throw new UserInputError('Not Authenticated, please sign in')
+      }
+
       const post = await Post.findOne({ where: { id: args.id } })
 
       if (!post) { 

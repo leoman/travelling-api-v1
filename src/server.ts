@@ -8,6 +8,7 @@ import logger from './logging'
 import { postTypeDef, postResolver } from './posts'
 import { locationTypeDef } from './locations'
 import { photoTypeDef, photoResolver } from './photos'
+import { authTypeDef, authResolver, authenticateToken } from './auth'
 
 import { sequelizeCheck, sequelizeSync } from './database'
 sequelizeCheck()
@@ -38,11 +39,11 @@ const resolvers: Resolvers = {
 }
 
 const schema = makeExecutableSchema({
-  typeDefs: [ Query, postTypeDef, locationTypeDef, photoTypeDef ],
-  resolvers: merge(resolvers, postResolver, photoResolver),
+  typeDefs: [ Query, postTypeDef, locationTypeDef, photoTypeDef, authTypeDef ],
+  resolvers: merge(resolvers, postResolver, photoResolver, authResolver),
 })
 
-const server = new ApolloServer({ schema })
+const server = new ApolloServer({ schema, context: async ({ req }) => authenticateToken(req) })
 
 server.listen().then(({ url, subscriptionsUrl }): void => {
   logger.log('info', `🚀 Server ready at ${url}`)
