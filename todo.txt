@@ -1,4 +1,0 @@
-Setup migrations
-Setup a database file to be imported
-Setup Post type
-Setup server file
