@@ -1,4 +1,3 @@
-// import Joi from 'joi'
 import slugify from 'slugify'
 import { Model, DataTypes, Association } from 'sequelize'
 // import { HasManyGetAssociationsMixin, HasManyAddAssociationMixin, HasManyHasAssociationMixin, Association, HasManyCountAssociationsMixin, HasManyCreateAssociationMixin } from 'sequelize';
@@ -11,17 +10,20 @@ enum Status {
   "draft" = "draft"
 }
 
-class Post extends Model {
-  public id!: number
-  public title!: string
-  public slug!: string
-  public titleColour!: string | null
-  public content!: string | null
-  public date!: Date | null
-  public order!: Date | null
-  public photo!: string | null
-  public status!: Status
+export interface PostI {
+  id?: number
+  title: string
+  slug?: string
+  titleColour?: string
+  content?: string
+  date?: Date
+  order?: Date
+  photo?: string
+  status?: Status
+}
 
+class Post extends Model<PostI> {
+  
   public dataValues: any
 
   // timestamps!
@@ -85,7 +87,7 @@ Post.init({
   tableName: 'posts',
 })
 
-Post.addHook('beforeSave', (post: Post) => {
+Post.addHook('beforeSave', (post: PostI) => {
   post.slug = slugify(post.title, { lower: true });
 })
 

@@ -1,14 +1,14 @@
 import { Model, DataTypes } from 'sequelize'
 import sequelize from '../database'
 
-class Photo extends Model {
-  public id!: number
-  public url!: string
+export interface PhotoI {
+  id?: number
+  url: string
+}
 
-  // timestamps!
+class Photo extends Model<PhotoI> {
   public readonly createdAt!: Date
   public readonly updatedAt!: Date
-
 }
 
 Photo.init({
