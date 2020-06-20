@@ -20,7 +20,7 @@ interface Resolvers {
   }
 }
 
-const authenticateUserCredentials = (username: string, password: string) => {
+export const authenticateUserCredentials = (username: string, password: string) => {
 
   const { user } = config.auth
   

@@ -1,5 +1,4 @@
-import request from 'supertest';
-import app from '../../server'
+import { graphQLRequest } from '../utils'
 import sequelize from '../../database'
 import { Photo, PhotoI } from '../../photos'
 import { Post, PostI } from '../../posts'
@@ -17,16 +16,6 @@ const photos: PhotoI[] = [
     url: 'https://live.staticflickr.com/65535/48572566706_11d7a68779_b.jpg',
   }
 ]
-
-const graphQLRequest = ({ query, bearer = null, variables = null }) => {
-  return request(app)
-    .post('/graphql')
-    .set('authorization', bearer)
-    .send({
-      variables,
-      query
-    })
-}
 
 const login = ({ username, password }, returnValues = `{
   token
