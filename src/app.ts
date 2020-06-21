@@ -1,4 +1,4 @@
-import app from './server'
+import app, { server } from './server'
 import logger from './logging'
 
 try {

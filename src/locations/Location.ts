@@ -1,17 +1,18 @@
 import { Model, DataTypes } from 'sequelize'
 import sequelize from '../database'
 
-class Location extends Model {
-  public id!: number
-  public location!: string
-  public lat!: number
-  public lng!: number
-  public hideFromBounding!: boolean
+export interface LocationI {
+  id?: number
+  location: string
+  lat?: number
+  lng?: number
+  duration?: number
+  hideFromBounding?: boolean
+}
 
-  // timestamps!
+class Location extends Model<LocationI> {
   public readonly createdAt!: Date
   public readonly updatedAt!: Date
-
 }
 
 Location.init({
@@ -28,6 +29,9 @@ Location.init({
   },
   lng: {
       type: new DataTypes.FLOAT
+  },
+  duration: {
+    type: new DataTypes.INTEGER,
   },
   hideFromBounding: {
       type: DataTypes.BOOLEAN,

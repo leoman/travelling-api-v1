@@ -2,10 +2,10 @@ import slugify from 'slugify'
 import { Model, DataTypes, Association } from 'sequelize'
 // import { HasManyGetAssociationsMixin, HasManyAddAssociationMixin, HasManyHasAssociationMixin, Association, HasManyCountAssociationsMixin, HasManyCreateAssociationMixin } from 'sequelize';
 import sequelize from '../database'
-import { Location } from '../locations'
+import { Location, LocationI } from '../locations'
 import { Photo } from '../photos'
 
-enum Status {
+export enum Status {
   "live" = "live",
   "draft" = "draft"
 }
@@ -16,10 +16,11 @@ export interface PostI {
   slug?: string
   titleColour?: string
   content?: string
-  date?: Date
-  order?: Date
+  date?: Date | string
+  order?: Date | string
   photo?: string
   status?: Status
+  location?: LocationI
 }
 
 class Post extends Model<PostI> {

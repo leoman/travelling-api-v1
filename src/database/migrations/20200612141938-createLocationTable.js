@@ -30,6 +30,9 @@ module.exports = {
       updatedAt: {
         type: Sequelize.DataTypes.DATE
       },
+      PostId: {
+        type: Sequelize.DataTypes.INTEGER
+      },
     });
   },
 
