@@ -33,6 +33,14 @@ describe('auth', () => {
       })
       .expect(200)
     })
+
+    it('should return an error when the the user credentials are wrong', async () => {
+      return login({ username: 'wrong', password: 'password' })
+        .expect(res => {
+          expect(res.body).toHaveProperty('errors')
+          expect(res.body.errors[0].message).toEqual('User credentials were incorrect')
+        })
+    })
   })
 
   describe('authenticateUserCredentials', () => {

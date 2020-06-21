@@ -1,3 +1,4 @@
+import { omit } from 'lodash'
 import { graphQLRequest, asyncForEach } from '../utils'
 import sequelize from '../../database'
 import { Post, PostI, Status } from '../../posts'
@@ -65,6 +66,7 @@ const allPosts = (status = null) => {
     query: `
       query {
         allPosts${where} {
+          id
           title
           titleColour
           content
@@ -93,6 +95,19 @@ const getPost = ({ id }) => {
           id: "${id}"
         ) {
           title
+          titleColour
+          content
+          date
+          order
+          photo
+          status
+          location {
+            location
+            lat
+            lng
+            duration
+            hideFromBounding
+          }
         }
       }
     `
@@ -230,7 +245,7 @@ describe('photos', () => {
       return allPosts()
         .expect(res => {
           const returnedPosts = res.body.data.allPosts.map((post: PostI) => ({
-            ...post,
+            ...omit(post, ['id']),
             date: new Date(Number(post.date)).toISOString(),
             order: new Date(Number(post.order)).toISOString(),
           }))
@@ -245,7 +260,7 @@ describe('photos', () => {
       return allPosts(Status.live)
         .expect(res => {
           const returnedPosts = res.body.data.allPosts.map((post: PostI) => ({
-            ...post,
+            ...omit(post, ['id']),
             date: new Date(Number(post.date)).toISOString(),
             order: new Date(Number(post.order)).toISOString(),
           }))
@@ -257,7 +272,33 @@ describe('photos', () => {
     })
   })
 
-  // describe('get post', () => {
+  describe('get post', () => {
+    it('should return a specfic post by ID', async () => {
+      const returnedAllPosts = await allPosts()
+      const firstReturnedId = returnedAllPosts.body.data.allPosts[0].id
 
-  // })
+      return getPost({ id: firstReturnedId })
+        .expect(res => {
+          const returnedPost = res.body.data.post
+          const updatedPost = {
+            ...res.body.data.post,
+            date: new Date(Number(returnedPost.date)).toISOString(),
+            order: new Date(Number(returnedPost.order)).toISOString(),
+          }
+          expect(res.body).toHaveProperty('data.post')
+          expect(updatedPost).toEqual(posts[0])
+        })
+        .expect(200)
+
+    })
+
+    it('should return an error when the ID cannot be found', async () => {
+      return getPost({ id: 0 })
+        .expect(res => {
+          expect(res.body).toHaveProperty('errors')
+          expect(res.body.errors[0].message).toEqual('Unable to fetch Post')
+        })
+    })
+  })
+
 })
