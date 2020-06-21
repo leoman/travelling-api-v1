@@ -4,7 +4,6 @@ import sequelize from '../../database'
 import { Post, PostI, Status } from '../../posts'
 import { Location, LocationI } from '../../locations'
 import config from '../../config/user.json'
-import { post } from 'superagent'
 
 const posts: PostI[] = [
   {
@@ -40,6 +39,23 @@ const posts: PostI[] = [
     }
   }
 ]
+
+const newPost: PostI = {
+  title: 'My third post',
+  titleColour: '#fff',
+  content: 'I am your father',
+  date: new Date(1592750588797).toISOString(),
+  order: new Date(1592750588797).toISOString(),
+  photo: 'https://live.staticflickr.com/65535/48529735877_7b3f6fcb0c_b.jpg',
+  status: Status.draft,
+  location: {
+    location: 'Valparaiso',
+    lat: -33.045559,
+    lng: -71.619423,
+    duration: 0,
+    hideFromBounding: false
+  }
+}
 
 const login = ({ username, password }, returnValues = `{
   token
@@ -122,32 +138,45 @@ const addPost = ({ title, titleColour, content, date, order, photo, status, loca
   order
   photo
   status
-  location
-  lat
-  lng
-  duration
-  hideFromBounding
+  location {
+    location
+    lat
+    lng
+    duration
+    hideFromBounding
+  }
 }`) => {
+
+  let sentBearer: string
+  let sentTitle: string = ''
+  if (bearer) {
+    sentBearer = `bearer ${bearer}`
+  }
+
+  if (title) {
+    sentTitle = `title: "${title}",`
+  }
+
   return graphQLRequest({
     query: `
       mutation {
         addPost(
-          title: "${title}",
+          ${sentTitle}
           titleColour: "${titleColour}",
           content: "${content}",
           date: "${date}",
           order: "${order}",
           photo: "${photo}",
-          status: "${status}",
+          status: ${status},
           location: "${location}",
-          lat: "${lat}",
-          lng: "${lng}",
-          duration: "${duration}",
-          hideFromBounding: "${hideFromBounding}",
+          lat: ${lat},
+          lng: ${lng},
+          duration: ${duration},
+          hideFromBounding: ${hideFromBounding},
         ) ${returnValues}
       }
     `,
-    bearer: `bearer ${bearer}`
+    bearer: sentBearer
   })
 }
 
@@ -160,11 +189,13 @@ const editPost = ({ id, title, titleColour, content, date, order, photo, status,
   order
   photo
   status
-  location
-  lat
-  lng
-  duration
-  hideFromBounding
+  location {
+    location
+    lat
+    lng
+    duration
+    hideFromBounding
+  }
 }`) => {
   return graphQLRequest({
     query: `
@@ -206,6 +237,12 @@ const deletePost = ({ id }, bearer: string, returnValues = `{
     bearer: `bearer ${bearer}`
   })
 }
+
+const returnPostWithISODates = (post: PostI) => ({
+  ...post,
+  date: new Date(Number(post.date)).toISOString(),
+  order: new Date(Number(post.order)).toISOString(),
+})
 
 beforeEach(async (done) => {
   await Post.destroy({where: {}})
@@ -297,6 +334,53 @@ describe('photos', () => {
         .expect(res => {
           expect(res.body).toHaveProperty('errors')
           expect(res.body.errors[0].message).toEqual('Unable to fetch Post')
+        })
+    })
+  })
+
+  describe('addPost', () => {
+    it('should add a new post', async () => {
+      const auth = await login({ username: 'admin', password: config.auth.user.reminder })
+      const bearer = auth.body.data.login.token
+      const { title, titleColour, content, date, order, photo, status, location : { location, lat, lng, duration, hideFromBounding } } = newPost
+
+      return addPost({ title, titleColour, content, date, order, photo, status, location, lat, lng, duration, hideFromBounding }, bearer)
+        .expect(res => {
+          expect(res.body.data).toHaveProperty('addPost')
+          expect(returnPostWithISODates(res.body.data.addPost)).toEqual(newPost)
+        })
+    })
+
+    it('should return an error when fields are missing', async () => {
+      const auth = await login({ username: 'admin', password: config.auth.user.reminder })
+      const bearer = auth.body.data.login.token
+      const { titleColour, content, date, order, photo, status, location : { location, lat, lng, duration, hideFromBounding } } = newPost
+      const title = null
+
+      return addPost({ title, titleColour, content, date, order, photo, status, location, lat, lng, duration, hideFromBounding }, bearer)
+        .expect(res => {
+          expect(res.body).toHaveProperty('errors')
+          expect(res.body.errors[0].message).toEqual('Field "addPost" argument "title" of type "String!" is required, but it was not provided.')
+        })
+    })
+
+    it('should return an error when the auth bearer is incorrect', async () => {
+        const { title, titleColour, content, date, order, photo, status, location : { location, lat, lng, duration, hideFromBounding } } = newPost
+
+      return addPost({ title, titleColour, content, date, order, photo, status, location, lat, lng, duration, hideFromBounding }, '1234567890')
+        .expect(res => {
+          expect(res.body).toHaveProperty('errors')
+          expect(res.body.errors[0].message).toEqual('Context creation failed: Failed to authenticate token.')
+        })
+    })
+
+    it('should return an error when the auth bearer is missing', async () => {
+      const { title, titleColour, content, date, order, photo, status, location : { location, lat, lng, duration, hideFromBounding } } = newPost
+
+      return addPost({ title, titleColour, content, date, order, photo, status, location, lat, lng, duration, hideFromBounding }, null)
+        .expect(res => {
+          expect(res.body).toHaveProperty('errors')
+          expect(res.body.errors[0].message).toEqual('Not Authenticated, please sign in')
         })
     })
   })
