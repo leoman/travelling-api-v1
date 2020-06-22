@@ -1,9 +1,8 @@
 import { omit } from 'lodash'
-import { graphQLRequest, asyncForEach } from '../utils'
+import { graphQLRequest, asyncForEach, getJWToken } from '../utils'
 import sequelize from '../../database'
 import { Post, PostI, Status } from '../../posts'
-import { Location, LocationI } from '../../locations'
-import config from '../../config/user.json'
+import { Location } from '../../locations'
 
 const posts: PostI[] = [
   {
@@ -57,22 +56,12 @@ const newPost: PostI = {
   }
 }
 
-const login = ({ username, password }, returnValues = `{
-  token
-}`) => {
-  return graphQLRequest({
-    query: `
-      mutation {
-        login(
-          username: "${username}",
-          password: "${password}",
-        ) ${returnValues}
-      }
-    `
-  })
+const editedPost = {
+  ...newPost,
+  title: 'An edited post'
 }
 
-const allPosts = (status = null) => {
+const allPosts = (status: string | null = null) => {
   let where = ''
   if (status) {
     where = `(status: "${status}")`
@@ -103,7 +92,7 @@ const allPosts = (status = null) => {
   })
 }
 
-const getPost = ({ id }) => {
+const getPost = ( id: number ) => {
   return graphQLRequest({
     query: `
       query {
@@ -130,7 +119,8 @@ const getPost = ({ id }) => {
   })
 }
 
-const addPost = ({ title, titleColour, content, date, order, photo, status, location, lat, lng, duration, hideFromBounding }, bearer: string, returnValues = `{
+const addPost = ({ title, titleColour, content, date, order, photo, status, location: { location, lat, lng, duration, hideFromBounding } }: PostI, bearer: string, returnValues = `{
+  id
   title
   titleColour
   content
@@ -147,9 +137,9 @@ const addPost = ({ title, titleColour, content, date, order, photo, status, loca
   }
 }`) => {
 
-  let sentBearer: string
+  let sentBearer: string = ''
   let sentTitle: string = ''
-  if (bearer) {
+  if (bearer && bearer !== '') {
     sentBearer = `bearer ${bearer}`
   }
 
@@ -180,7 +170,7 @@ const addPost = ({ title, titleColour, content, date, order, photo, status, loca
   })
 }
 
-const editPost = ({ id, title, titleColour, content, date, order, photo, status, location, lat, lng, duration, hideFromBounding }, bearer: string, returnValues = `{
+const editPost = ({ id, title, titleColour, content, date, order, photo, status, location: { location, lat, lng, duration, hideFromBounding } }: PostI, bearer: string, returnValues = `{
   id
   title
   titleColour
@@ -197,6 +187,12 @@ const editPost = ({ id, title, titleColour, content, date, order, photo, status,
     hideFromBounding
   }
 }`) => {
+
+  let sentBearer: string = ''
+  if (bearer && bearer !== '') {
+    sentBearer = `bearer ${bearer}`
+  }
+
   return graphQLRequest({
     query: `
       mutation {
@@ -208,22 +204,22 @@ const editPost = ({ id, title, titleColour, content, date, order, photo, status,
           date: "${date}",
           order: "${order}",
           photo: "${photo}",
-          status: "${status}",
+          status: ${status},
           location: "${location}",
-          lat: "${lat}",
-          lng: "${lng}",
-          duration: "${duration}",
-          hideFromBounding: "${hideFromBounding}",
+          lat: ${lat},
+          lng: ${lng},
+          duration: ${duration},
+          hideFromBounding: ${hideFromBounding},
         ) ${returnValues}
       }
     `,
-    bearer: `bearer ${bearer}`
+    bearer: sentBearer
   })
 }
 
 
 
-const deletePost = ({ id }, bearer: string, returnValues = `{
+const deletePost = (id: number, bearer: string, returnValues = `{
   success
 }`) => {
   return graphQLRequest({
@@ -314,7 +310,7 @@ describe('photos', () => {
       const returnedAllPosts = await allPosts()
       const firstReturnedId = returnedAllPosts.body.data.allPosts[0].id
 
-      return getPost({ id: firstReturnedId })
+      return getPost(firstReturnedId)
         .expect(res => {
           const returnedPost = res.body.data.post
           const updatedPost = {
@@ -330,7 +326,7 @@ describe('photos', () => {
     })
 
     it('should return an error when the ID cannot be found', async () => {
-      return getPost({ id: 0 })
+      return getPost(0)
         .expect(res => {
           expect(res.body).toHaveProperty('errors')
           expect(res.body.errors[0].message).toEqual('Unable to fetch Post')
@@ -340,24 +336,28 @@ describe('photos', () => {
 
   describe('addPost', () => {
     it('should add a new post', async () => {
-      const auth = await login({ username: 'admin', password: config.auth.user.reminder })
-      const bearer = auth.body.data.login.token
-      const { title, titleColour, content, date, order, photo, status, location : { location, lat, lng, duration, hideFromBounding } } = newPost
+      const bearer = await getJWToken()
 
-      return addPost({ title, titleColour, content, date, order, photo, status, location, lat, lng, duration, hideFromBounding }, bearer)
+      return addPost(newPost, bearer)
         .expect(res => {
+
+          const returnedPost :PostI = res.body.data.addPost
+          const omittedPost = omit(returnedPost, ['id'])
+
           expect(res.body.data).toHaveProperty('addPost')
-          expect(returnPostWithISODates(res.body.data.addPost)).toEqual(newPost)
+          expect(returnPostWithISODates(omittedPost)).toEqual(newPost)
         })
     })
 
     it('should return an error when fields are missing', async () => {
-      const auth = await login({ username: 'admin', password: config.auth.user.reminder })
-      const bearer = auth.body.data.login.token
-      const { titleColour, content, date, order, photo, status, location : { location, lat, lng, duration, hideFromBounding } } = newPost
-      const title = null
+      const bearer = await getJWToken()
 
-      return addPost({ title, titleColour, content, date, order, photo, status, location, lat, lng, duration, hideFromBounding }, bearer)
+      const modifiedPost = {
+        ...newPost,
+        title: null
+      }
+
+      return addPost(modifiedPost, bearer)
         .expect(res => {
           expect(res.body).toHaveProperty('errors')
           expect(res.body.errors[0].message).toEqual('Field "addPost" argument "title" of type "String!" is required, but it was not provided.')
@@ -365,9 +365,7 @@ describe('photos', () => {
     })
 
     it('should return an error when the auth bearer is incorrect', async () => {
-        const { title, titleColour, content, date, order, photo, status, location : { location, lat, lng, duration, hideFromBounding } } = newPost
-
-      return addPost({ title, titleColour, content, date, order, photo, status, location, lat, lng, duration, hideFromBounding }, '1234567890')
+      return addPost(newPost, '1234567890')
         .expect(res => {
           expect(res.body).toHaveProperty('errors')
           expect(res.body.errors[0].message).toEqual('Context creation failed: Failed to authenticate token.')
@@ -375,13 +373,102 @@ describe('photos', () => {
     })
 
     it('should return an error when the auth bearer is missing', async () => {
-      const { title, titleColour, content, date, order, photo, status, location : { location, lat, lng, duration, hideFromBounding } } = newPost
-
-      return addPost({ title, titleColour, content, date, order, photo, status, location, lat, lng, duration, hideFromBounding }, null)
+      return addPost(newPost, '')
         .expect(res => {
           expect(res.body).toHaveProperty('errors')
           expect(res.body.errors[0].message).toEqual('Not Authenticated, please sign in')
         })
+    })
+  })
+
+  describe('editPost', () => {
+
+    it('should edit an existing post', async () => {
+
+    })
+
+    it('should return an error if the post ID doesnt match', async () => {
+      const bearer = await getJWToken()
+
+      const postToEdit = {
+        id: 0,
+        ...editedPost
+      }
+
+      return editPost(postToEdit, bearer)
+        .expect(res => {
+          expect(res.body).toHaveProperty('errors')
+          expect(res.body.errors[0].message).toEqual('Unable to update Post with ID: 0')
+        })
+    })
+
+    it('should return an error if the auth fails', async () => {
+
+      const returnedAllPosts = await allPosts()
+      const firstReturnedId = returnedAllPosts.body.data.allPosts[0].id
+
+      const postToEdit = {
+        id: firstReturnedId,
+        ...editedPost
+      }
+
+      return editPost(postToEdit, '')
+        .expect(res => {
+          expect(res.body).toHaveProperty('errors')
+          expect(res.body.errors[0].message).toEqual('Not Authenticated, please sign in')
+        })
+    })
+
+  })
+
+  describe('deletePost', () => {
+
+    it('should not delete a post when auth fails', async () => {
+      const returnedAllPosts = await allPosts()
+      const firstReturnedId = returnedAllPosts.body.data.allPosts[0].id
+
+      return deletePost(firstReturnedId, '')
+        .expect(res => {
+          expect(res.body).toHaveProperty('errors')
+          expect(res.body.errors[0].message).toEqual('Not Authenticated, please sign in')
+        })
+    })
+
+    it('should not delete a post when the ID doesnt match', async () => {
+      const bearer = await getJWToken()
+
+      return deletePost(0, bearer)
+        .expect(res => {
+          expect(res.body).toHaveProperty('errors')
+          expect(res.body.errors[0].message).toEqual('No Post found with ID: 0')
+        })
+    })
+
+    it('should delete a post', async () => {
+      const bearer = await getJWToken()
+      const returnedNewPost = await addPost(newPost, bearer)
+      const newPostId = returnedNewPost.body.data.addPost.id
+
+      await allPosts()
+        .expect(res => {
+          expect(res.body).toHaveProperty('data.allPosts')
+          expect(res.body.data.allPosts.length).toEqual(3)
+        })
+        .expect(200)
+
+      await deletePost(newPostId, bearer)
+        .expect(res => {
+          expect(res.body).toHaveProperty('data.deletePost')
+          expect(res.body.data.deletePost.success).toEqual(true)
+        })
+        .expect(200)
+
+      return allPosts()
+        .expect(res => {
+          expect(res.body).toHaveProperty('data.allPosts')
+          expect(res.body.data.allPosts.length).toEqual(2)
+        })
+        .expect(200)
     })
   })
 
