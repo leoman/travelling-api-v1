@@ -1,10 +1,6 @@
 import { Model, DataTypes } from 'sequelize'
 import sequelize from '../database'
-
-export interface PhotoI {
-  id?: number
-  url: string
-}
+import { Photo as PhotoI } from '../types'
 
 class Photo extends Model<PhotoI> {
   public readonly createdAt!: Date

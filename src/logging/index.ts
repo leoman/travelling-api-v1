@@ -27,7 +27,7 @@ if (process.env.NODE_ENV === 'development') {
   }));
 }
 
-logger.debug = (data: object | string) => {
+logger.debug = (data: any | string) => {
   let object;
 
   if (typeof data === 'string' || data instanceof String) {

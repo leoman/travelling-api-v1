@@ -1,14 +1,6 @@
 import { Model, DataTypes } from 'sequelize'
 import sequelize from '../database'
-
-export interface LocationI {
-  id?: number
-  location: string
-  lat?: number
-  lng?: number
-  duration?: number
-  hideFromBounding?: boolean
-}
+import { Location as LocationI } from '../types'
 
 class Location extends Model<LocationI> {
   public readonly createdAt!: Date

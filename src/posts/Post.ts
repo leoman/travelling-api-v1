@@ -2,8 +2,9 @@ import slugify from 'slugify'
 import { Model, DataTypes, Association } from 'sequelize'
 // import { HasManyGetAssociationsMixin, HasManyAddAssociationMixin, HasManyHasAssociationMixin, Association, HasManyCountAssociationsMixin, HasManyCreateAssociationMixin } from 'sequelize';
 import sequelize from '../database'
-import { Location, LocationI } from '../locations'
+import { Location } from '../locations'
 import { Photo } from '../photos'
+import { Location as LocationI } from '../types'
 
 export enum Status {
   "live" = "live",
@@ -20,7 +21,7 @@ export interface PostI {
   order?: Date | string
   photo?: string
   status?: Status
-  location?: LocationI
+  location: LocationI
 }
 
 class Post extends Model<PostI> {
@@ -88,7 +89,7 @@ Post.init({
   tableName: 'posts',
 })
 
-Post.addHook('beforeSave', (post: PostI) => {
+Post.addHook('beforeSave', (post: Post) => {
   post.slug = slugify(post.title, { lower: true });
 })
 
