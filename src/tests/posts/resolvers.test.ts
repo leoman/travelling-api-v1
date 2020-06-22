@@ -385,6 +385,21 @@ describe('photos', () => {
 
     it('should edit an existing post', async () => {
 
+      const bearer = await getJWToken()
+      const returnedAllPosts = await allPosts()
+      const firstReturnedId = returnedAllPosts.body.data.allPosts[0].id
+
+      const postToEdit = {
+        id: firstReturnedId,
+        ...editedPost
+      }
+
+      return editPost(postToEdit, bearer)
+        .expect(res => {
+          expect(res.body.data).toHaveProperty('editPost')
+          expect(returnPostWithISODates(res.body.data.editPost)).toEqual(postToEdit)
+        })
+
     })
 
     it('should return an error if the post ID doesnt match', async () => {
