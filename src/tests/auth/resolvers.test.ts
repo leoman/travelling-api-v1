@@ -1,22 +1,7 @@
-import { graphQLRequest } from '../utils'
+import { login } from '../utils'
 import sequelize from '../../database'
 import { authenticateUserCredentials } from '../../auth/resolvers'
 import config from '../../config/user.json'
-
-const login = ({ username, password }, returnValues = `{
-  token
-}`) => {
-  return graphQLRequest({
-    query: `
-      mutation {
-        login(
-          username: "${username}",
-          password: "${password}",
-        ) ${returnValues}
-      }
-    `
-  })
-}
 
 afterAll(async () => {
   sequelize.close() 
@@ -47,11 +32,11 @@ describe('auth', () => {
 
     it('should throw a UserInputError when the wrong credentials are passed', () => {
       expect(() => {
-        const user = authenticateUserCredentials('', '')
+        authenticateUserCredentials('', '')
       }).toThrow('User credentials were incorrect');
       
       expect(() => {
-        const user = authenticateUserCredentials('wrong', 'password')
+        authenticateUserCredentials('wrong', 'password')
       }).toThrow('User credentials were incorrect');
     })
 

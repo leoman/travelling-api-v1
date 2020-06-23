@@ -4,25 +4,7 @@ import { Model, DataTypes, Association } from 'sequelize'
 import sequelize from '../database'
 import { Location } from '../locations'
 import { Photo } from '../photos'
-import { Location as LocationI } from '../types'
-
-export enum Status {
-  "live" = "live",
-  "draft" = "draft"
-}
-
-export interface PostI {
-  id?: number
-  title: string
-  slug?: string
-  titleColour?: string
-  content?: string
-  date?: Date | string
-  order?: Date | string
-  photo?: string
-  status?: Status
-  location: LocationI
-}
+import { Post as PostI, Status } from '../types'
 
 class Post extends Model<PostI> {
   
@@ -90,6 +72,7 @@ Post.init({
 })
 
 Post.addHook('beforeSave', (post: Post) => {
+  // @ts-ignore
   post.slug = slugify(post.title, { lower: true });
 })
 

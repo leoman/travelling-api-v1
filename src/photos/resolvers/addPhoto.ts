@@ -2,9 +2,9 @@ import { UserInputError } from 'apollo-server'
 import logger from '../../logging'
 import { Photo } from '../'
 import { Post } from '../../posts'
-import { Context, PostArgs } from '../../types'
+import { Context, PhotoPostArgs } from '../../types'
 
-export default async (_parent: any, args: PostArgs, { decodedToken }: Context) => {
+export default async (_parent: any, args: PhotoPostArgs, { decodedToken }: Context) => {
   try {
 
     if (!decodedToken) {

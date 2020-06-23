@@ -1,8 +1,16 @@
-import { graphQLRequest } from '../utils'
+import { graphQLRequest, getJWToken, asyncForEach } from '../utils'
 import sequelize from '../../database'
-import { Photo, PhotoI } from '../../photos'
-import { Post, PostI } from '../../posts'
-import config from '../../config/user.json'
+import { Photo } from '../../photos'
+import { Post } from '../../posts'
+import { Photo as PhotoI, Post as PostI } from '../../types'
+
+interface SelectPhoto {
+  id: number
+}
+
+interface NewPhoto extends SelectPhoto {
+  url: string
+}
 
 const post: PostI = {
   title: 'My first post'
@@ -17,21 +25,6 @@ const photos: PhotoI[] = [
   }
 ]
 
-const login = ({ username, password }, returnValues = `{
-  token
-}`) => {
-  return graphQLRequest({
-    query: `
-      mutation {
-        login(
-          username: "${username}",
-          password: "${password}",
-        ) ${returnValues}
-      }
-    `
-  })
-}
-
 const allPhotos = () => {
   return graphQLRequest({
     query: `
@@ -44,7 +37,7 @@ const allPhotos = () => {
   })
 }
 
-const addPhotos = ({ id, url }, bearer: string, returnValues = `{
+const addPhotos = ({ id, url }: NewPhoto, bearer: string, returnValues = `{
   id
   url
 }`) => {
@@ -61,7 +54,7 @@ const addPhotos = ({ id, url }, bearer: string, returnValues = `{
   })
 }
 
-const deletePhoto = ({ id }, bearer: string, returnValues = `{
+const deletePhoto = ({ id }: SelectPhoto, bearer: string, returnValues = `{
   success
 }`) => {
   return graphQLRequest({
@@ -76,22 +69,29 @@ const deletePhoto = ({ id }, bearer: string, returnValues = `{
   })
 }
 
-beforeEach(async () => {
+beforeEach(async (done) => {
   await Photo.destroy({where: {}})
   await Post.destroy({where: {}})
 
-  photos.forEach(async (photo: PhotoI) => {
-    await Photo
+  await asyncForEach(photos, async (photo: PhotoI) => {
+    
+    try {
+      return await Photo
       .create({
         url: photo.url,
       })
+    } catch(error) {
+      console.log(error)
+    }
   })
+  done()
 })
 
-afterAll(async () => {
+afterAll(async (done) => {
   await Photo.destroy({where: {}})
   await Post.destroy({where: {}})
   sequelize.close() 
+  done()
 })
 
 describe('photos', () => {
@@ -109,9 +109,7 @@ describe('photos', () => {
 
       const newPost = await Post.create(post)
 
-      const auth = await login({ username: 'admin', password: config.auth.user.reminder })
-
-      const bearer = auth.body.data.login.token
+      const bearer = await getJWToken()
 
       const newPhoto = { id: newPost.id, url: 'https://live.staticflickr.com/65535/48572714307_32c1605b43_b.jpg'}
 
@@ -127,9 +125,7 @@ describe('photos', () => {
 
       const newPost = await Post.create(post)
 
-      const auth = await login({ username: 'admin', password: config.auth.user.reminder })
-
-      const bearer = auth.body.data.login.token
+      const bearer = await getJWToken()
 
       const newPhoto = { id: newPost.id, url: 'https://live.staticflickr.com/65535/48572714307_32c1605b43_b.jpg'}
 

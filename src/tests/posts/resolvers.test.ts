@@ -1,8 +1,9 @@
 import { omit } from 'lodash'
 import { graphQLRequest, asyncForEach, getJWToken } from '../utils'
 import sequelize from '../../database'
-import { Post, PostI, Status } from '../../posts'
+import { Post } from '../../posts'
 import { Location } from '../../locations'
+import { Post as PostI, Status } from '../../types'
 
 const posts: PostI[] = [
   {
@@ -119,6 +120,7 @@ const getPost = ( id: number ) => {
   })
 }
 
+// @ts-ignore
 const addPost = ({ title, titleColour, content, date, order, photo, status, location: { location, lat, lng, duration, hideFromBounding } }: PostI, bearer: string, returnValues = `{
   id
   title
@@ -170,6 +172,7 @@ const addPost = ({ title, titleColour, content, date, order, photo, status, loca
   })
 }
 
+// @ts-ignore
 const editPost = ({ id, title, titleColour, content, date, order, photo, status, location: { location, lat, lng, duration, hideFromBounding } }: PostI, bearer: string, returnValues = `{
   id
   title
@@ -266,10 +269,11 @@ beforeEach(async (done) => {
   done()
 })
 
-afterAll(async () => {
+afterAll(async (done) => {
   await Post.destroy({where: {}})
   await Location.destroy({where: {}})
   sequelize.close()
+  done()
 })
 
 describe('photos', () => {
@@ -357,6 +361,7 @@ describe('photos', () => {
         title: null
       }
 
+      // @ts-ignore // adding a nulled field to represent it not being added in the front end
       return addPost(modifiedPost, bearer)
         .expect(res => {
           expect(res.body).toHaveProperty('errors')
