@@ -20,7 +20,7 @@ export default async (_parent: any, args: DeleteArgs, { decodedToken }: Context)
   try {
     await photo.destroy()
     logger.log('info', `Deleting Photo with ID: ${args.id}`)
-    return { success: true, message: 'Deleted' }
+    return { success: true, message: 'Deleted', id: args.id }
   } catch(error) {
     throw new ApolloError(`Unable to delete Photo with ID: ${args.id}`, '500', {
       error

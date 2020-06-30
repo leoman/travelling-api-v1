@@ -2,7 +2,7 @@ export const typeDef = `
   
   extend type Query {
     allPosts(status: String): [Post!]!
-    post(id: String): Post!
+    post(id: String, slug: String): Post!
   }
 
   extend type Mutation {

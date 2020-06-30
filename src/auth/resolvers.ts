@@ -64,7 +64,9 @@ export const resolvers: Resolvers = {
           level: 'error',
           message:'Error logging in',
         })
-        throw error
+        throw new UserInputError(`Error logging in`, {
+          invalidArgs: args,
+        })
       }
     }
   }

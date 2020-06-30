@@ -7,6 +7,7 @@ export const typeDef = `
   type PhotoDeleteResponse {
     success: Boolean!
     message: String!
+    id: String!
   }
 
   extend type Query {

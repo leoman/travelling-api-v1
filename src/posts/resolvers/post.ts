@@ -5,9 +5,20 @@ import { SelectPostArgs } from '../../types'
 
 export default async (_parent: any, args: SelectPostArgs) => {
   try {
-    logger.log('info', `Finding a single Post: ${args.id}`)
+    
+    const { id, slug }: SelectPostArgs = args
 
-    const post = await Post.findOne({ where: { id: args.id }, include: [
+    if (!id && !slug) {
+      throw new UserInputError(`No ID or Slug was provided`, {
+        invalidArgs: args,
+      })
+    }
+
+    const where = (id) ? { id } : { slug }
+
+    logger.log('info', `Finding a single Post: ${JSON.stringify(where)}`)
+
+    const post = await Post.findOne({ where: where, include: [
       { association: Post.associations.Location, },
       { association: Post.associations.Photos, }
     ] })

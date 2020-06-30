@@ -45,7 +45,8 @@ export interface PatchArgs extends PostArgs {
 }
 
 export interface SelectPostArgs {
-  id: string
+  id?: string
+  slug?: string
 }
 
 interface DeleteSuccess {

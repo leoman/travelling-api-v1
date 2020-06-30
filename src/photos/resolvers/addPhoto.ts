@@ -26,7 +26,7 @@ export default async (_parent: any, args: PhotoPostArgs, { decodedToken }: Conte
         url: args.url,
       })
 
-    await post.setPhotos(photo)
+    await post.addPhoto(photo)
 
     logger.log('info', `Saving a new Photo to a post Post ${photo.url}`)
    
