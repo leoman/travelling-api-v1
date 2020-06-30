@@ -23,7 +23,7 @@ describe('auth', () => {
       return login({ username: 'wrong', password: 'password' })
         .expect(res => {
           expect(res.body).toHaveProperty('errors')
-          expect(res.body.errors[0].message).toEqual('User credentials were incorrect')
+          expect(res.body.errors[0].message).toEqual('Error logging in')
         })
     })
   })
