@@ -6,7 +6,7 @@
   "scripts": {
     "tsc": "tsc",
     "dev": "ts-node-dev src/app.ts --inspect",
-    "start": "NODE_ENV=production node build/app.js",
+    "start": "npm run tsc && NODE_ENV=production node build/app.js",
     "prelive": "NODE_ENV=production ./node_modules/.bin/sequelize db:migrate",
     "lint": "eslint --ext .ts .",
     "pretest": "NODE_ENV=test ./node_modules/.bin/sequelize db:migrate",
