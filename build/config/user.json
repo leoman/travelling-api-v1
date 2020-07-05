@@ -1,0 +1,10 @@
+{
+    "auth": {
+        "secret": "S8T34Obr6aRLycqjtOyzngfTJTSxRxYC",
+        "user": {
+            "username": "admin",
+            "password": "$2a$08$cDv5wxqUy7aOQpmxA6T2ZuWGsgAvDhamQlNzdRBHMGU0aqROeBOF6",
+            "reminder": "2019Travelling"
+        }
+    }
+}
