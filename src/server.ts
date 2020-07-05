@@ -32,6 +32,7 @@ const resolvers = {
 
 const schema = makeExecutableSchema({
   typeDefs: [ Query, postTypeDef, locationTypeDef, photoTypeDef, authTypeDef ],
+  // @ts-ignore
   resolvers: merge(resolvers, postResolver, photoResolver, authResolver),
 })
 

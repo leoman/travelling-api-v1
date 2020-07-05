@@ -37,6 +37,7 @@ export default async (_parent: any, args: PostPatchArgs, { decodedToken }: Conte
 
     const updatedPost = await post.update(postFieldsToUpdate)
 
+    // @ts-ignore
     const updatedLocation = await updatedPost.Location.update(locationFieldsToUpdate)
 
     logger.log('info', `Editing a Post with ID: ${args.id}`)

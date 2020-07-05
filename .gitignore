@@ -2,3 +2,4 @@ node_modules
 logs/*
 src/config/user.json
 latest.dump
+build

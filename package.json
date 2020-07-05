@@ -6,6 +6,8 @@
   "scripts": {
     "tsc": "tsc",
     "dev": "ts-node-dev src/app.ts --inspect",
+    "start": "NODE_ENV=production node build/app.js",
+    "prelive": "NODE_ENV=production ./node_modules/.bin/sequelize db:migrate",
     "lint": "eslint --ext .ts .",
     "pretest": "NODE_ENV=test ./node_modules/.bin/sequelize db:migrate",
     "test": "npx jest --runInBand"
@@ -42,6 +44,7 @@
     "typescript": "^3.9.5"
   },
   "dependencies": {
+    "@types/bluebird": "^3.5.32",
     "apollo-server": "^2.14.3",
     "apollo-server-express": "^2.15.0",
     "bcryptjs": "^2.4.3",
@@ -58,6 +61,8 @@
     "winston-transport": "^4.3.0"
   },
   "jest": {
-      "setupFiles": ["<rootDir>/jest-set-up/index.js"]
+    "setupFiles": [
+      "<rootDir>/jest-set-up/index.js"
+    ]
   }
 }

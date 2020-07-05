@@ -32,14 +32,16 @@ export default async (_parent: any, args: PostPostArgs, { decodedToken }: Contex
           order: args.order,
       }
     )
-
+    
+    // @ts-ignore
     await post.setLocation(location)
-
+    // @ts-ignore
     logger.log('info', `Saving a new Post ${post.title}`)
    
     return {
       ...post.dataValues,
       location: {
+            // @ts-ignore
         ...location.dataValues
       }
     }

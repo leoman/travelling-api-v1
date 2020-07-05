@@ -1,4 +1,4 @@
-import databaseConfig from './database.json'
+import databaseConfig from './database'
 
 export enum ConfigEnviroment {
   development = "development",

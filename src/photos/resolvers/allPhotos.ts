@@ -6,6 +6,7 @@ import { Photo as PhotoI } from '../../types'
 export default async () => {
   try {
     logger.log('info', 'Finding all Photos')
+    // @ts-ignore
     const photos: PhotoI[] = await Photo.findAll()
     return photos
   } catch(error) {

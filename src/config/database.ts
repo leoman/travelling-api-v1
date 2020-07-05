@@ -1,4 +1,4 @@
-{
+export default {
   "development": {
     "username": "travelling",
     "password": "password",
@@ -15,10 +15,10 @@
     "logging": false
   },
   "production": {
-    "username": "travelling",
-    "password": null,
-    "database": "database_production",
-    "host": "127.0.0.1",
+    "username": process.env.PROD_DATABASE_USERNAME || null,
+    "password": process.env.PROD_DATABASE_PASSWORD || null,
+    "database": process.env.PROD_DATABASE_NAME || null,
+    "host": process.env.PROD_DATABASE_HOST || null,
     "dialect": "postgres"
   }
 }

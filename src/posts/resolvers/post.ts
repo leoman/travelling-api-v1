@@ -31,7 +31,9 @@ export default async (_parent: any, args: SelectPostArgs) => {
 
     return {
       ...post.dataValues,
+      // @ts-ignore
       location: post.Location,
+      // @ts-ignore
       photos: post.Photos
     }
   } catch(error) {
