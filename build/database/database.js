@@ -25,6 +25,7 @@ exports.sequelizeCheck = () => __awaiter(void 0, void 0, void 0, function* () {
         logging_1.default.log('info', 'Connection to the database has been established successfully.');
     })
         .catch((err) => {
+        console.log(err);
         logging_1.default.log({
             level: 'error',
             message: 'Unable to connect to the database:',

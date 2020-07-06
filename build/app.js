@@ -24,8 +24,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const server_1 = __importStar(require("./server"));
 const logging_1 = __importDefault(require("./logging"));
+const port = process.env.PORT || 4000;
 try {
-    server_1.default.listen({ port: 4000 }, () => logging_1.default.log('info', `🚀 Server ready at http://localhost:4000${server_1.server.graphqlPath}`));
+    server_1.default.listen({ port }, () => logging_1.default.log('info', `🚀 Server ready at http://localhost:${port}${server_1.server.graphqlPath}`));
 }
 catch (error) {
     console.log(error);

@@ -13,6 +13,7 @@ export const sequelizeCheck = async () => {
     logger.log('info', 'Connection to the database has been established successfully.')
   })
   .catch((err: string) => {
+    console.log(err)
     logger.log({
       level: 'error',
       message:'Unable to connect to the database:',
