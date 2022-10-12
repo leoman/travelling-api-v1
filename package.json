@@ -45,7 +45,7 @@
   },
   "dependencies": {
     "@types/bluebird": "^3.5.32",
-    "apollo-server": "^2.14.3",
+    "apollo-server": "^2.25.4",
     "apollo-server-express": "^2.15.0",
     "bcryptjs": "^2.4.3",
     "graphql": "^15.1.0",
